@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>JHA — D. Wilson Construction</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+
+:root {
+  --orange: #E8500A;
+  --dark: #181818;
+  --mid: #262626;
+  --card: #2E2E2E;
+  --border: #3D3D3D;
+  --light: #F0EFE9;
+  --accent: #FFB800;
+  --green: #27AE60;
+  --muted: #888;
+  --red: #E74C3C;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--dark);
+  color: var(--light);
+  min-height: 100vh;
+  padding-bottom: 90px;
+  overscroll-behavior: none;
+}
+
+/* ── HEADER ── */
+.hdr {
+  background: var(--orange);
+  padding: 12px 16px 10px;
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 3px 16px rgba(0,0,0,.55);
+}
+.hdr-row { display: flex; justify-content: space-between; align-items: center; }
+.hdr-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800; font-size: 1.25rem; color: #fff; line-height: 1.1;
+}
+.hdr-title span {
+  display: block; font-size: .7rem; font-weight: 600;
+  letter-spacing: 2px; opacity: .85; text-transform: uppercase;
+}
+.hdr-step {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: .9rem;
+  background: rgba(0,0,0,.22); color: #fff;
+  padding: 4px 11px; border-radius: 20px;
+}
+.prog-bar { margin-top: 9px; height: 4px; background: rgba(255,255,255,.25); border-radius: 4px; overflow: hidden; }
+.prog-fill { height: 100%; background: #fff; border-radius: 4px; transition: width .4s ease; }
+
+/* ── SECTIONS ── */
+.sec { display: none; padding: 20px 16px; animation: sIn .3s ease; }
+.sec.on { display: block; }
+@keyframes sIn { from { opacity:0; transform:translateX(18px); } to { opacity:1; transform:translateX(0); } }
+
+.sec-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800; font-size: 1.45rem; letter-spacing: .8px;
+  color: var(--orange); text-transform: uppercase;
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-icon {
+  width: 30px; height: 30px; background: var(--orange);
+  border-radius: 6px; display: flex; align-items: center;
+  justify-content: center; font-size: .95rem; flex-shrink: 0;
+}
+
+/* ── FORM ELEMENTS ── */
+.fld { margin-bottom: 14px; }
+label.lbl {
+  display: block; font-size: .7rem; font-weight: 600;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 5px;
+}
+input[type=text], input[type=date], textarea, select {
+  width: 100%; background: var(--mid); border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--light);
+  font-family: 'Barlow', sans-serif; font-size: 1rem;
+  padding: 11px 13px; outline: none; transition: border-color .2s;
+  -webkit-appearance: none; appearance: none;
+}
+input[type=text]:focus, input[type=date]:focus, textarea:focus { border-color: var(--orange); }
+textarea { resize: vertical; min-height: 78px; }
+
+/* required field highlight */
+input.req-err, textarea.req-err { border-color: var(--red) !important; }
+
+/* ── CHIPS ── */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+.chip {
+  background: var(--mid); border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 7px 15px;
+  font-size: .82rem; font-weight: 500; cursor: pointer; transition: all .15s;
+}
+.chip.on { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+/* ── RADIO BUTTONS ── */
+.radios { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 14px; }
+.rbtn {
+  flex: 1; min-width: 72px; background: var(--mid);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; text-align: center; cursor: pointer;
+  font-weight: 600; font-size: .88rem; transition: all .15s;
+}
+.rbtn.on { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+/* ── CHECKBOXES ── */
+.cklist { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+.cklist.col1 { grid-template-columns: 1fr; }
+.ckitem {
+  background: var(--mid); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 9px 11px;
+  display: flex; align-items: center; gap: 9px;
+  cursor: pointer; transition: all .15s;
+}
+.ckitem.on { background: rgba(232,80,10,.13); border-color: var(--orange); }
+.ckitem input { display: none; }
+.ckbox {
+  width: 20px; height: 20px; border: 2px solid var(--border);
+  border-radius: 4px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; font-size: .75rem;
+}
+.ckitem.on .ckbox { background: var(--orange); border-color: var(--orange); }
+.ckitem.on .ckbox::after { content: '✓'; color: #fff; font-weight: 700; }
+.cklabel { font-size: .78rem; font-weight: 500; line-height: 1.2; }
+
+/* ── SUB LABELS ── */
+.slbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: .95rem; color: var(--accent);
+  letter-spacing: .4px; margin: 12px 0 7px; text-transform: uppercase;
+}
+
+/* ── INFO CARD ── */
+.info {
+  background: rgba(255,184,0,.08); border: 1px solid rgba(255,184,0,.3);
+  border-radius: 8px; padding: 9px 13px;
+  font-size: .82rem; color: var(--accent); margin-bottom: 13px;
+}
+
+/* ── NUMBERED FIELDS ── */
+.nfield { display: flex; gap: 9px; margin-bottom: 9px; align-items: flex-start; }
+.nnum {
+  width: 27px; height: 27px; background: var(--orange);
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: .88rem; flex-shrink: 0; margin-top: 9px;
+}
+.nfield input { flex: 1; }
+
+/* ── CREW SIGNATURES ── */
+.crew-card {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 10px; margin-bottom: 10px; overflow: hidden;
+}
+.crew-head {
+  display: flex; gap: 8px; padding: 9px 11px;
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.crew-head input {
+  background: transparent; border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--light); font-family: 'Barlow', sans-serif;
+  font-size: .9rem; padding: 3px 7px; border-radius: 0; outline: none;
+  transition: border-color .2s;
+}
+.crew-head input:focus { border-bottom-color: var(--orange); }
+.crew-name-input { flex: 2; min-width: 120px; }
+.crew-hh-input { flex: 1; min-width: 80px; }
+canvas.sigpad {
+  display: block; width: 100%; height: 80px;
+  background: #fff; cursor: crosshair; touch-action: none;
+}
+.sig-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 10px; background: rgba(0,0,0,.2);
+}
+.sig-hint { font-size: .68rem; color: var(--muted); }
+.sig-clr {
+  font-size: .7rem; color: var(--muted); background: none;
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 2px 8px; cursor: pointer; font-family: 'Barlow', sans-serif;
+}
+.add-crew {
+  width: 100%; background: rgba(232,80,10,.08);
+  border: 2px dashed var(--orange); border-radius: 8px;
+  color: var(--orange); font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: .95rem; letter-spacing: 1px;
+  padding: 11px; cursor: pointer; margin-top: 4px;
+}
+
+/* ── NAV BUTTONS ── */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; gap: 9px; padding: 12px 16px;
+  background: var(--dark); border-top: 1px solid var(--border); z-index: 200;
+}
+.btn {
+  flex: 1; padding: 13px; border-radius: 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 1.05rem; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer; border: none; transition: all .15s;
+}
+.btn:active { transform: scale(.97); }
+.btn-back { background: var(--mid); border: 1.5px solid var(--border); color: var(--light); }
+.btn-next { background: var(--orange); color: #fff; }
+.btn-submit { background: var(--green); color: #fff; }
+
+/* ── REVIEW ── */
+.rev-block { background: var(--card); border-radius: 10px; padding: 13px 14px; margin-bottom: 10px; font-size: .85rem; line-height: 1.7; }
+.rev-block b { color: var(--accent); font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 2px; }
+
+/* ── SENDING OVERLAY ── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.88); z-index: 999;
+  align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+}
+.overlay.on { display: flex; }
+.spin {
+  width: 46px; height: 46px; border: 4px solid rgba(255,255,255,.18);
+  border-top-color: var(--orange); border-radius: 50%;
+  animation: sp .75s linear infinite;
+}
+@keyframes sp { to { transform: rotate(360deg); } }
+.overlay p { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; color: #fff; }
+
+/* ── SUCCESS ── */
+.success { display: none; padding: 50px 20px; text-align: center; }
+.success.on { display: block; }
+.success .ico { font-size: 3.5rem; margin-bottom: 14px; }
+.success h2 { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 1.9rem; color: var(--green); margin-bottom: 10px; }
+.success p { color: var(--muted); font-size: .95rem; line-height: 1.6; }
+.success strong { color: var(--light); }
+
+/* ── ERROR TOAST ── */
+.toast {
+  position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+  background: var(--red); color: #fff; padding: 10px 20px; border-radius: 8px;
+  font-size: .9rem; font-weight: 600; z-index: 999; white-space: nowrap;
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+.toast.on { opacity: 1; }
+
+hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr" id="mainHdr">
+  <div class="hdr-row">
+    <div class="hdr-title">Job Hazard Analysis<span>D. Wilson Construction</span></div>
+    <div class="hdr-step" id="stepInd">1 / 17</div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:5.9%"></div></div>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay"><div class="spin"></div><p id="overlayMsg">SUBMITTING...</p></div>
+<!-- TOAST -->
+<div class="toast" id="toast">Please fill in required fields</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 1 — Basic Info
+══════════════════════════════════════════ -->
+<div class="sec on" id="s1">
+  <div class="sec-title"><div class="sec-icon">🏢</div>Basic Info</div>
+  <div class="fld"><label class="lbl">Company *</label><input type="text" id="company" placeholder="Company name"></div>
+  <div class="fld"><label class="lbl">Foreman / Name *</label><input type="text" id="fname" placeholder="Full name"></div>
+  <div class="fld"><label class="lbl">Date *</label><input type="date" id="fdate"></div>
+  <div class="fld"><label class="lbl">Location *</label><input type="text" id="location" placeholder="Job site address / description"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 2 — Scope
+══════════════════════════════════════════ -->
+<div class="sec" id="s2">
+  <div class="sec-title"><div class="sec-icon">📋</div>Scope of Work</div>
+  <div class="fld">
+    <label class="lbl">Describe today's scope of work *</label>
+    <textarea id="scope" placeholder="What work will be performed today?"></textarea>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 3 — Weather
+══════════════════════════════════════════ -->
+<div class="sec" id="s3">
+  <div class="sec-title"><div class="sec-icon">🌤️</div>Weather Conditions</div>
+  <div class="slbl">Weather</div>
+  <div class="chips" id="wxChips">
+    <div class="chip" data-g="wx" data-v="Clear">☀️ Clear</div>
+    <div class="chip" data-g="wx" data-v="Rain">🌧️ Rain</div>
+    <div class="chip" data-g="wx" data-v="Overcast">☁️ Overcast</div>
+    <div class="chip" data-g="wx" data-v="Sunny">🌞 Sunny</div>
+    <div class="chip" data-g="wx" data-v="Drizzle">🌦️ Drizzle</div>
+    <div class="chip" data-g="wx" data-v="Foggy">🌫️ Foggy</div>
+    <div class="chip" data-g="wx" data-v="Other">Other</div>
+  </div>
+  <div class="fld"><label class="lbl">Temperature (°F)</label><input type="text" id="temp" placeholder="e.g. 92°F"></div>
+  <div class="slbl">Wind</div>
+  <div class="radios">
+    <div class="rbtn" data-g="wind" data-v="Very Light">Very Light</div>
+    <div class="rbtn" data-g="wind" data-v="Windy">Windy</div>
+    <div class="rbtn" data-g="wind" data-v="Very Windy">Very Windy</div>
+  </div>
+  <div class="fld"><label class="lbl">Notes</label><textarea id="wxNotes" placeholder="Additional weather notes..."></textarea></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 4 — Emergency Procedures
+══════════════════════════════════════════ -->
+<div class="sec" id="s4">
+  <div class="sec-title"><div class="sec-icon">🚨</div>Emergency Procedures</div>
+  <div class="info">⚠️ Complete all emergency info before work begins.</div>
+
+  <div class="slbl">Are you aware to notify D. Wilson in case of accident?</div>
+  <div class="radios">
+    <div class="rbtn" data-g="notifyW" data-v="Yes">Yes</div>
+    <div class="rbtn" data-g="notifyW" data-v="No">No</div>
+  </div>
+
+  <div class="slbl">Were you injured today?</div>
+  <div class="radios">
+    <div class="rbtn" data-g="injured" data-v="Yes">Yes</div>
+    <div class="rbtn" data-g="injured" data-v="No">No</div>
+  </div>
+
+  <div class="slbl">Locations Confirmed</div>
+  <div class="cklist col1">
+    <div class="ckitem" data-k="firstAid" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">First Aid Kit Location <span style="color:var(--accent);font-weight:600">– DWCC office</span></span></div>
+    <div class="ckitem" data-k="stretcher" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Stretcher / Basket / High-Rise Rescue Location <span style="color:var(--accent);font-weight:600">– N/A</span></span></div>
+    <div class="ckitem" data-k="msds" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">M.S.D.S / S.D.S Location <span style="color:var(--accent);font-weight:600">– DWCC office</span></span></div>
+    <div class="ckitem" data-k="evacuation" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Evacuation Points <span style="color:var(--accent);font-weight:600">– Parking Lot</span></span></div>
+    <div class="ckitem" data-k="fireExt" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Fire Extinguisher Location(s) <span style="color:var(--accent);font-weight:600">– Renovated Spaces / RR</span></span></div>
+  </div>
+
+  <hr class="div">
+  <div class="fld"><label class="lbl">Clinic Name</label><input type="text" id="clinicName" placeholder="Nearest clinic name"></div>
+  <div class="fld"><label class="lbl">Clinic Location</label><input type="text" id="clinicLoc" placeholder="Clinic address / location"></div>
+  <div class="slbl">I know where the clinic is located</div>
+  <div class="radios">
+    <div class="rbtn" data-g="clinicProto" data-v="Yes">Yes</div>
+    <div class="rbtn" data-g="clinicProto" data-v="No">No</div>
+  </div>
+  <div class="fld"><label class="lbl">Nearest Hospital Name</label><input type="text" id="hospName" placeholder="Hospital name"></div>
+  <div class="fld"><label class="lbl">Nearest Hospital Location</label><input type="text" id="hospLoc" placeholder="Hospital address"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 5 — Steps Involved
+══════════════════════════════════════════ -->
+<div class="sec" id="s5">
+  <div class="sec-title"><div class="sec-icon">🔢</div>Steps Involved</div>
+  <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px">List the steps involved in preparing for your work (up to 5).</p>
+  <div style="background:rgba(255,184,0,0.07);border:1px solid rgba(255,184,0,0.25);border-radius:8px;padding:11px 13px;margin-bottom:16px">
+    <p style="font-size:.72rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Examples</p>
+    <p style="font-size:.75rem;color:var(--muted);line-height:1.6;margin-bottom:6px"><span style="color:var(--light);font-weight:600">Painter</span> — Scope: paint walls &nbsp;/&nbsp; Steps: locate wash and water area, tape up surrounding areas, clean surfaces after work is done</p>
+    <p style="font-size:.75rem;color:var(--muted);line-height:1.6;margin-bottom:6px"><span style="color:var(--light);font-weight:600">Drywall</span> — Scope: frame walls &nbsp;/&nbsp; Steps: gather material, lay out and frame walls, general clean up</p>
+    <p style="font-size:.75rem;color:var(--muted);line-height:1.6"><span style="color:var(--light);font-weight:600">HVAC</span> — Scope: demo ductwork &nbsp;/&nbsp; Steps: gather ladder and tools, identify hazards overhead, remove ductwork, remove trash from building, and clean</p>
+  </div>
+  <div class="nfield"><div class="nnum">1</div><input type="text" id="step1" placeholder="Step 1…"></div>
+  <div class="nfield"><div class="nnum">2</div><input type="text" id="step2" placeholder="Step 2…"></div>
+  <div class="nfield"><div class="nnum">3</div><input type="text" id="step3" placeholder="Step 3…"></div>
+  <div class="nfield"><div class="nnum">4</div><input type="text" id="step4" placeholder="Step 4…"></div>
+  <div class="nfield"><div class="nnum">5</div><input type="text" id="step5" placeholder="Step 5…"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 6 — Potential Hazards
+══════════════════════════════════════════ -->
+<div class="sec" id="s6">
+  <div class="sec-title"><div class="sec-icon">⚠️</div>Potential Hazards</div>
+  <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Check ALL hazards related to the scope of work today.</p>
+  <div class="cklist">
+    <div class="ckitem" data-k="h_access"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Access / Egress</span></div>
+    <div class="ckitem" data-k="h_crane"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Crane</span></div>
+    <div class="ckitem" data-k="h_fire"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Fire Hazards</span></div>
+    <div class="ckitem" data-k="h_impale"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Impalement Hazards</span></div>
+    <div class="ckitem" data-k="h_mathand"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Material Handling</span></div>
+    <div class="ckitem" data-k="h_public"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Access to General Public</span></div>
+    <div class="ckitem" data-k="h_demo"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Demolition</span></div>
+    <div class="ckitem" data-k="h_flooropen" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Floor / Wall Openings</span></div>
+    <div class="ckitem" data-k="h_ladders"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Ladders (Tied Off / Inspected)</span></div>
+    <div class="ckitem" data-k="h_ovhdpwr"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Overhead Power Lines</span></div>
+    <div class="ckitem" data-k="h_barric"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Barricades / Signage</span></div>
+    <div class="ckitem" data-k="h_elec"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Electrical Hazards</span></div>
+    <div class="ckitem" data-k="h_guard"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Guardrails / Toeboards / Bracing</span></div>
+    <div class="ckitem" data-k="h_lifts"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Lifts</span></div>
+    <div class="ckitem" data-k="h_pinch"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Pinch Points</span></div>
+    <div class="ckitem" data-k="h_chem"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Chemical Hazards</span></div>
+    <div class="ckitem" data-k="h_excav"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Excavation / Trench</span></div>
+    <div class="ckitem" data-k="h_hearing"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Hearing Protection</span></div>
+    <div class="ckitem" data-k="h_lighting"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Lighting</span></div>
+    <div class="ckitem" data-k="h_powder"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Powder Actuated Tools</span></div>
+    <div class="ckitem" data-k="h_confined"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Confined Spaces</span></div>
+    <div class="ckitem" data-k="h_fall"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Fall Hazards</span></div>
+    <div class="ckitem" data-k="h_heavyeq"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Heavy Equipment</span></div>
+    <div class="ckitem" data-k="h_lockout"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Lockout / Tagout</span></div>
+    <div class="ckitem" data-k="h_traffic"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Traffic Control</span></div>
+    <div class="ckitem" data-k="h_inspect"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Inspection Current</span></div>
+    <div class="ckitem" data-k="h_protools"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Proper Tools for the Job</span></div>
+    <div class="ckitem" data-k="h_toolcond"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Tools in Good Working Condition</span></div>
+    <div class="ckitem" data-k="h_qualreq"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Qualification Required</span></div>
+    <div class="ckitem" data-k="h_liftinsp"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Lift Equipment Properly Inspected by Qualified Person</span></div>
+    <div class="ckitem" data-k="h_manlift"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Manual Lifting Equipment</span></div>
+    <div class="ckitem" data-k="h_rigging"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Proper Rigging Practices</span></div>
+    <div class="ckitem" data-k="h_legs50"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Manual Lifting (Using Your Legs) &lt;50 lbs</span></div>
+    <div class="ckitem" data-k="h_holes"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Hole Covers</span></div>
+    <div class="ckitem" data-k="h_ovhdwk"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Overhead Work / Other</span></div>
+    <div class="ckitem" data-k="h_wkcrews"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Work Crews Heavy Equipment</span></div>
+    <div class="ckitem" data-k="h_underground" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Underground Utilities</span></div>
+    <div class="ckitem" data-k="h_scaffold"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Scaffold (Properly Inspected by Competent Person)</span></div>
+    <div class="ckitem" data-k="h_basket"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Personal Basket (Inspected and Approved)</span></div>
+    <div class="ckitem" data-k="h_aeriallift" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Aerial Lift / Certification</span></div>
+    <div class="ckitem" data-k="h_confined2" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Confined Space (Entry)</span></div>
+    <div class="ckitem" data-k="h_trystart"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Try Start / Stop Switch</span></div>
+    <div class="ckitem" data-k="h_gfci"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">GFCI</span></div>
+    <div class="ckitem" data-k="h_slip"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Slip / Trip Potential</span></div>
+    <div class="ckitem" data-k="h_bodypos"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Body Position / Line of Fire</span></div>
+    <div class="ckitem" data-k="h_crush"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Crush By / Struck By / Contact With</span></div>
+    <div class="ckitem" data-k="h_anchor"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Adequate Anchorage Points</span></div>
+    <div class="ckitem" data-k="h_sharp"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Sharp Objects</span></div>
+  </div>
+  <div class="fld"><label class="lbl">Other Hazards</label><input type="text" id="otherHaz" placeholder="Describe any additional hazards…"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 7 — Preventive Measures
+══════════════════════════════════════════ -->
+<div class="sec" id="s7">
+  <div class="sec-title"><div class="sec-icon">🛡️</div>Preventive Measures</div>
+
+  <!-- Selected hazards reference panel — populated by JS on render -->
+  <div id="hazardRef" style="background:rgba(232,80,10,0.08);border:1px solid rgba(232,80,10,0.3);border-radius:8px;padding:11px 13px;margin-bottom:16px">
+    <p style="font-size:.7rem;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">⚠️ Hazards Selected — Address Each Below</p>
+    <div id="hazardRefList" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <p id="hazardRefEmpty" style="font-size:.78rem;color:var(--muted);display:none;font-style:italic">No hazards selected — go back to Potential Hazards to make selections.</p>
+  </div>
+
+  <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">List preventive measures for each identified hazard (up to 8).</p>
+  <div class="nfield"><div class="nnum">1</div><input type="text" id="pm1" placeholder="Preventive measure 1…"></div>
+  <div class="nfield"><div class="nnum">2</div><input type="text" id="pm2" placeholder="Preventive measure 2…"></div>
+  <div class="nfield"><div class="nnum">3</div><input type="text" id="pm3" placeholder="Preventive measure 3…"></div>
+  <div class="nfield"><div class="nnum">4</div><input type="text" id="pm4" placeholder="Preventive measure 4…"></div>
+  <div class="nfield"><div class="nnum">5</div><input type="text" id="pm5" placeholder="Preventive measure 5…"></div>
+  <div class="nfield"><div class="nnum">6</div><input type="text" id="pm6" placeholder="Preventive measure 6…"></div>
+  <div class="nfield"><div class="nnum">7</div><input type="text" id="pm7" placeholder="Preventive measure 7…"></div>
+  <div class="nfield"><div class="nnum">8</div><input type="text" id="pm8" placeholder="Preventive measure 8…"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 8 — Ergonomic Risk Factors
+══════════════════════════════════════════ -->
+<div class="sec" id="s8">
+  <div class="sec-title"><div class="sec-icon">💪</div>Ergonomic Risk Factors</div>
+  <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Check all ergonomic risk factors identified.</p>
+  <div class="cklist">
+    <div class="ckitem" data-k="e_awkward"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Awkward Positioning</span></div>
+    <div class="ckitem" data-k="e_reach"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Reach / Clear Access</span></div>
+    <div class="ckitem" data-k="e_force"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Excessive Force</span></div>
+    <div class="ckitem" data-k="e_repetitive" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Repetitive Movements</span></div>
+    <div class="ckitem" data-k="e_lifting"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Lifting</span></div>
+    <div class="ckitem" data-k="e_sharpsurf" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Sharp Work Surfaces</span></div>
+    <div class="ckitem" data-k="e_overhead"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Overhead Work</span></div>
+    <div class="ckitem" data-k="e_vibrating" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Vibrating Tools / Equipment</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 9 — PPE Required
+══════════════════════════════════════════ -->
+<div class="sec" id="s9">
+  <div class="sec-title"><div class="sec-icon">🦺</div>PPE Required</div>
+  <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Select all PPE required for today's work.</p>
+  <div class="cklist">
+    <div class="ckitem" data-k="ppe_hat"     onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Hard Hat</span></div>
+    <div class="ckitem" data-k="ppe_glasses" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Safety Glasses</span></div>
+    <div class="ckitem" data-k="ppe_vest"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Safety Vest</span></div>
+    <div class="ckitem" data-k="ppe_boots"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Work Boots</span></div>
+  </div>
+  <div class="fld"><label class="lbl">Additional PPE</label><input type="text" id="otherPPE" placeholder="e.g. gloves, respirator, ear protection…"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTIONS 10–14 — Civil Work
+══════════════════════════════════════════ -->
+<div class="sec" id="s10">
+  <div class="sec-title"><div class="sec-icon">🚜</div>Civil Work</div>
+  <div class="info">⚙️ Engineer-Approved Trenching Plan required for trenches &gt;5 ft.</div>
+  <div class="slbl">Does today's work include civil / excavation work?</div>
+  <div class="radios" style="margin-bottom:16px">
+    <div class="rbtn" data-g="civilApplies" data-v="Yes" onclick="toggleCivilFields(false)">Yes</div>
+    <div class="rbtn" data-g="civilApplies" data-v="N/A" onclick="toggleCivilFields(true)">N/A — Skip</div>
+  </div>
+  <div id="civilFields">
+    <div class="slbl">1. Type and Depth of Excavations</div>
+    <div class="radios" style="margin-bottom:10px">
+      <div class="rbtn" data-g="soilType" data-v="Type A Soil/Rock">Type A</div>
+      <div class="rbtn" data-g="soilType" data-v="Type B Soil/Rock">Type B</div>
+      <div class="rbtn" data-g="soilType" data-v="Type C Soil/Rock">Type C</div>
+    </div>
+    <div class="fld"><label class="lbl">Excavation Depth Description</label><input type="text" id="excavDepth" placeholder="Describe depth and type of excavation…"></div>
+  </div>
+</div>
+
+<div class="sec" id="s11">
+  <div class="sec-title"><div class="sec-icon">🚜</div>Civil Work — Pt 2</div>
+  <div class="slbl">2. Cave-in / Engulfment Control Measures (Trenches &gt;5 ft)</div>
+  <div class="cklist">
+    <div class="ckitem" data-k="ci_sloping"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Sloping</span></div>
+    <div class="ckitem" data-k="ci_benching"  onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Benching</span></div>
+    <div class="ckitem" data-k="ci_trenching" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Trenching</span></div>
+    <div class="ckitem" data-k="ci_shoring"   onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Shoring</span></div>
+    <div class="ckitem" data-k="ci_shield"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Shield / Box</span></div>
+    <div class="ckitem" data-k="ci_ladder"    onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Ladder in Trench &gt;5 ft and Every 25'</span></div>
+    <div class="ckitem" data-k="ci_sump"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Sump Pump</span></div>
+    <div class="ckitem" data-k="ci_loto"      onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">LOTO</span></div>
+  </div>
+</div>
+
+<div class="sec" id="s12">
+  <div class="sec-title"><div class="sec-icon">🚜</div>Civil Work — Pt 3</div>
+  <div class="fld"><label class="lbl">3. Elevation / Site Terrain / Environmental Concerns / Hazards</label><textarea id="terrain" placeholder="Describe elevation, terrain, environmental hazards…"></textarea></div>
+  <div class="fld"><label class="lbl">4. Hazards with Site / Vehicle Access</label><textarea id="vehicleAccess" placeholder="High traffic, heavy haul, boom cranes, storage of materials/HAZMAT…"></textarea></div>
+</div>
+
+<div class="sec" id="s13">
+  <div class="sec-title"><div class="sec-icon">🚜</div>Civil Work — Pt 4</div>
+  <div class="fld"><label class="lbl">5. Electrical or Gas Concerns / Hazards</label><textarea id="elecGas" placeholder="e.g. Electrical / Gas / Fiber Optic line…"></textarea></div>
+
+  <div class="slbl">6. Have existing utilities been potholed / located?</div>
+  <div class="radios">
+    <div class="rbtn" data-g="utilLoc" data-v="Yes">Yes</div>
+    <div class="rbtn" data-g="utilLoc" data-v="No">No</div>
+    <div class="rbtn" data-g="utilLoc" data-v="N/A">N/A</div>
+  </div>
+  <div class="slbl">7. Has Texas 811 hotline been contacted?</div>
+  <div class="radios">
+    <div class="rbtn" data-g="tx811" data-v="Yes">Yes</div>
+    <div class="rbtn" data-g="tx811" data-v="No">No</div>
+    <div class="rbtn" data-g="tx811" data-v="N/A">N/A</div>
+  </div>
+</div>
+
+<div class="sec" id="s14">
+  <div class="sec-title"><div class="sec-icon">🚜</div>Civil Work — Pt 5</div>
+  <div class="slbl">8. Have utility shut valves been located?</div>
+  <div class="radios">
+    <div class="rbtn" data-g="shutValves" data-v="Yes">Yes</div>
+    <div class="rbtn" data-g="shutValves" data-v="No">No</div>
+    <div class="rbtn" data-g="shutValves" data-v="N/A">N/A</div>
+  </div>
+  <div class="slbl">9. Have excavations been inspected by a trained competent person?</div>
+  <div class="radios">
+    <div class="rbtn" data-g="excavInsp" data-v="Yes">Yes</div>
+    <div class="rbtn" data-g="excavInsp" data-v="No">No</div>
+    <div class="rbtn" data-g="excavInsp" data-v="N/A">N/A</div>
+  </div>
+  <div class="fld"><label class="lbl">10. Weather Conditions at Excavation Site</label><input type="text" id="civilWx" placeholder="Wet, mud, dry, cracks, etc."></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 15 — JHA Reviewer
+══════════════════════════════════════════ -->
+<div class="sec" id="s15">
+  <div class="sec-title"><div class="sec-icon">✅</div>JHA Reviewer</div>
+  <div class="info">The reviewer certifies this JHA was completed accurately before work began.</div>
+  <div class="fld"><label class="lbl">Reviewer Name *</label><input type="text" id="reviewer" placeholder="Reviewer's full name"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 16 — Crew Signatures
+══════════════════════════════════════════ -->
+<div class="sec" id="s16">
+  <div class="sec-title"><div class="sec-icon">✍️</div>Crew Signatures</div>
+  <p style="font-size:.82rem;color:var(--muted);margin-bottom:13px">All crew members (including subcontractors) must sign. Tap canvas to sign.</p>
+  <div id="crewList"></div>
+  <button class="add-crew" onclick="addCrew()">＋ ADD CREW MEMBER</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SECTION 17 — Review & Submit
+══════════════════════════════════════════ -->
+<div class="sec" id="s17">
+  <div class="sec-title"><div class="sec-icon">📤</div>Review &amp; Submit</div>
+  <div class="info">📋 Review your JHA before submitting. It will be emailed to omarr@dwilsonconstruction.com</div>
+  <div id="revContent"></div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success" id="successSc">
+  <div class="ico">✅</div>
+  <h2>JHA Submitted!</h2>
+  <p>Your Job Hazard Analysis has been emailed to<br><strong>omarr@dwilsonconstruction.com</strong></p>
+  <br>
+  <p>Date: <strong id="succDate"></strong></p>
+  <br>
+  <p style="font-size:.8rem;color:var(--muted)">Screenshot this screen for your records.</p>
+</div>
+
+<!-- NAV -->
+<div class="nav" id="navBar">
+  <button class="btn btn-back" id="btnBack" onclick="go(-1)" style="display:none">← BACK</button>
+  <button class="btn btn-next" id="btnNext" onclick="go(1)">NEXT →</button>
+</div>
+
+<script>
+// ──────────────────────────────────────────
+// EmailJS — fill in your own IDs after
+// signing up at emailjs.com (free)
+// ──────────────────────────────────────────
+const EJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // from EmailJS dashboard
+const EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // e.g. 'service_abc123'
+const EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // e.g. 'template_jha001'
+
+(function(){ emailjs.init({ publicKey: EJS_PUBLIC_KEY }); })();
+
+// ──────────────────────────────────────────
+// State
+// ──────────────────────────────────────────
+const TOTAL = 17;
+let cur = 1;
+let crewIdx = 0;
+
+// ──────────────────────────────────────────
+// Civil Work N/A skip logic
+// ──────────────────────────────────────────
+const CIVIL_SECS = [11, 12, 13, 14]; // sections to skip when civil is N/A
+
+function civilIsNA() {
+  return getRadio('civilApplies') === 'N/A';
+}
+
+function toggleCivilFields(hide) {
+  const f = document.getElementById('civilFields');
+  if (f) f.style.display = hide ? 'none' : 'block';
+}
+
+// ──────────────────────────────────────────
+// Navigation
+// ──────────────────────────────────────────
+function go(dir) {
+  if (dir === 1 && !validate()) return;
+  if (dir === 1 && cur === TOTAL) { submitJHA(); return; }
+  let next = cur + dir;
+  // Skip civil detail sections if N/A selected
+  if (civilIsNA()) {
+    if (dir === 1 && cur === 10)  next = 15; // jump past civil detail
+    if (dir === -1 && cur === 15) next = 10; // jump back to civil entry
+  }
+  cur = Math.max(1, Math.min(TOTAL, next));
+  render();
+}
+
+function render() {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.getElementById(`s${cur}`).classList.add('on');
+  document.getElementById('stepInd').textContent = `${cur} / ${TOTAL}`;
+  document.getElementById('progFill').style.width = `${(cur / TOTAL) * 100}%`;
+  document.getElementById('btnBack').style.display = cur === 1 ? 'none' : 'block';
+  const nb = document.getElementById('btnNext');
+  if (cur === TOTAL) {
+    nb.className = 'btn btn-submit';
+    nb.textContent = '📤 SUBMIT JHA';
+    buildReview();
+  } else {
+    nb.className = 'btn btn-next';
+    nb.textContent = 'NEXT →';
+  }
+  if (cur === 7) buildHazardRef();
+  window.scrollTo(0, 0);
+}
+
+// ──────────────────────────────────────────
+// Hazard reference panel for Preventive Measures
+// ──────────────────────────────────────────
+function buildHazardRef() {
+  const hazards = getChecked('h_');
+  const otherHaz = document.getElementById('otherHaz')?.value.trim();
+  if (otherHaz) hazards.push(otherHaz);
+
+  const list = document.getElementById('hazardRefList');
+  const empty = document.getElementById('hazardRefEmpty');
+  list.innerHTML = '';
+
+  if (hazards.length === 0) {
+    list.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  list.style.display = 'flex';
+  empty.style.display = 'none';
+  hazards.forEach(h => {
+    const tag = document.createElement('span');
+    tag.textContent = h;
+    tag.style.cssText = `
+      background: rgba(232,80,10,0.18);
+      border: 1px solid rgba(232,80,10,0.5);
+      border-radius: 5px;
+      padding: 3px 9px;
+      font-size: .73rem;
+      font-weight: 600;
+      color: #F5F5F0;
+      line-height: 1.4;
+    `;
+    list.appendChild(tag);
+  });
+}
+
+// ──────────────────────────────────────────
+// Validation (only required fields)
+// ──────────────────────────────────────────
+const REQ = { 1: ['company','fname','fdate','location'], 2: ['scope'], 15: ['reviewer'] };
+
+function validate() {
+  const fields = REQ[cur];
+  if (!fields) return true;
+  let ok = true;
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!el.value.trim()) { el.classList.add('req-err'); ok = false; }
+    else el.classList.remove('req-err');
+    el.addEventListener('input', () => el.classList.remove('req-err'), { once: true });
+  });
+  if (!ok) showToast('Please fill in all required fields (*)');
+  return ok;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2800);
+}
+
+// ──────────────────────────────────────────
+// Chips & Radio buttons
+// ──────────────────────────────────────────
+document.addEventListener('click', e => {
+  const chip = e.target.closest('.chip[data-g]');
+  if (chip) {
+    document.querySelectorAll(`.chip[data-g="${chip.dataset.g}"]`).forEach(c => c.classList.remove('on'));
+    chip.classList.add('on'); return;
+  }
+  const rb = e.target.closest('.rbtn[data-g]');
+  if (rb) {
+    document.querySelectorAll(`.rbtn[data-g="${rb.dataset.g}"]`).forEach(r => r.classList.remove('on'));
+    rb.classList.add('on'); return;
+  }
+});
+
+function getChip(g)  { const el = document.querySelector(`.chip[data-g="${g}"].on`);  return el ? el.dataset.v : '—'; }
+function getRadio(g) { const el = document.querySelector(`.rbtn[data-g="${g}"].on`); return el ? el.dataset.v : '—'; }
+
+// ──────────────────────────────────────────
+// Checkboxes
+// ──────────────────────────────────────────
+function ck(el) {
+  el.classList.toggle('on');
+  el.querySelector('input').checked = el.classList.contains('on');
+}
+
+function getChecked(prefix) {
+  return [...document.querySelectorAll(`.ckitem[data-k^="${prefix}"].on`)]
+    .map(el => el.querySelector('.cklabel').textContent.trim());
+}
+
+// ──────────────────────────────────────────
+// Crew / Signature pads
+// ──────────────────────────────────────────
+function addCrew() {
+  crewIdx++;
+  const i = crewIdx;
+  const d = document.createElement('div');
+  d.className = 'crew-card'; d.id = `crew_${i}`;
+  d.innerHTML = `
+    <div class="crew-head">
+      <input type="text" class="crew-name-input" id="cName_${i}" placeholder="Printed Name">
+      <input type="text" class="crew-hh-input"   id="cHH_${i}"   placeholder="Hard Hat #">
+    </div>
+    <canvas class="sigpad" id="sig_${i}" width="800" height="160"></canvas>
+    <div class="sig-bar">
+      <span class="sig-hint">✍️ Sign above</span>
+      <button class="sig-clr" onclick="clearSig(${i})">Clear</button>
+    </div>`;
+  document.getElementById('crewList').appendChild(d);
+  initPad(i);
+}
+
+function clearSig(i) {
+  const c = document.getElementById(`sig_${i}`);
+  c.getContext('2d').clearRect(0, 0, c.width, c.height);
+}
+
+function initPad(i) {
+  const canvas = document.getElementById(`sig_${i}`);
+  const ctx = canvas.getContext('2d');
+  let drawing = false, lx = 0, ly = 0;
+
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const sx = canvas.width / r.width, sy = canvas.height / r.height;
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) * sx, y: (src.clientY - r.top) * sy };
+  }
+  function start(e) { e.preventDefault(); drawing = true; const p = pos(e); lx = p.x; ly = p.y; }
+  function draw(e)  {
+    if (!drawing) return; e.preventDefault();
+    const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(p.x, p.y);
+    ctx.strokeStyle = '#111'; ctx.lineWidth = 2.8; ctx.lineCap = 'round'; ctx.stroke();
+    lx = p.x; ly = p.y;
+  }
+  function stop() { drawing = false; }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stop);
+  canvas.addEventListener('mouseleave', stop);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove',  draw,  { passive: false });
+  canvas.addEventListener('touchend',   stop);
+}
+
+// ──────────────────────────────────────────
+// Helpers
+// ──────────────────────────────────────────
+const v = id => { const e = document.getElementById(id); return e ? (e.value.trim() || '—') : '—'; };
+const nl = arr => arr.length ? arr.join('\n') : 'None selected';
+
+function collectData() {
+  const crew = [];
+  for (let i = 1; i <= crewIdx; i++) {
+    crew.push({
+      name: v(`cName_${i}`),
+      hh:   v(`cHH_${i}`),
+      sig:  document.getElementById(`sig_${i}`)?.toDataURL('image/png') || ''
+    });
+  }
+  return {
+    company: v('company'), name: v('fname'), date: v('fdate'), location: v('location'),
+    scope: v('scope'),
+    weather: getChip('wx'), temp: v('temp'), wind: getRadio('wind'), wxNotes: v('wxNotes'),
+    notifyW: getRadio('notifyW'), injured: getRadio('injured'),
+    emergChecks: ['firstAid','stretcher','msds','evacuation','fireExt']
+                   .filter(k => document.querySelector(`.ckitem[data-k="${k}"].on`)),
+    clinicName: v('clinicName'), clinicLoc: v('clinicLoc'),
+    clinicProto: getRadio('clinicProto'), hospName: v('hospName'), hospLoc: v('hospLoc'),
+    steps: [v('step1'),v('step2'),v('step3'),v('step4'),v('step5')].filter(s => s !== '—'),
+    hazards: getChecked('h_'), otherHaz: v('otherHaz'),
+    preventive: [v('pm1'),v('pm2'),v('pm3'),v('pm4'),v('pm5'),v('pm6'),v('pm7'),v('pm8')].filter(s => s !== '—'),
+    ergos: getChecked('e_'),
+    ppe: getChecked('ppe_'), otherPPE: v('otherPPE'),
+    soilType: civilIsNA() ? '' : getRadio('soilType'), excavDepth: civilIsNA() ? '' : v('excavDepth'),
+    civilControls: civilIsNA() ? [] : getChecked('ci_'),
+    terrain: civilIsNA() ? '' : v('terrain'), vehicleAccess: civilIsNA() ? '' : v('vehicleAccess'), elecGas: civilIsNA() ? '' : v('elecGas'),
+    utilLoc: civilIsNA() ? '' : getRadio('utilLoc'), tx811: civilIsNA() ? '' : getRadio('tx811'),
+    shutValves: civilIsNA() ? '' : getRadio('shutValves'), excavInsp: civilIsNA() ? '' : getRadio('excavInsp'), civilWx: civilIsNA() ? '' : v('civilWx'),
+    reviewer: v('reviewer'),
+    crew
+  };
+}
+
+// ──────────────────────────────────────────
+// Review section
+// ──────────────────────────────────────────
+function buildReview() {
+  const d = collectData();
+  const sec = (title, body) => `
+    <div class="rev-block">
+      <b>${title}</b>${body}
+    </div>`;
+  const ck = (arr, k) => arr.includes(k) ? '☑' : '☐';
+  const ekLabels = {firstAid:'First Aid Kit',stretcher:'Stretcher/Basket/High-Rise Rescue',
+                    msds:'M.S.D.S/S.D.S',evacuation:'Evacuation Points',fireExt:'Fire Extinguisher'};
+
+  document.getElementById('revContent').innerHTML = [
+    sec('Basic Info', `Company: ${d.company} | Name: ${d.name}<br>Date: ${d.date} | Location: ${d.location}`),
+    sec('Scope', d.scope),
+    sec('Weather', `${d.weather} | ${d.temp} | Wind: ${d.wind}${d.wxNotes !== '—' ? '<br>Notes: '+d.wxNotes : ''}`),
+    sec('Emergency', `Notify D. Wilson: ${d.notifyW} | Injured: ${d.injured}<br>
+      ${['firstAid','stretcher','msds','evacuation','fireExt'].map(k=>`${ck(d.emergChecks,k)} ${ekLabels[k]}`).join(' &nbsp; ')}<br>
+      Clinic: ${d.clinicName} (${d.clinicLoc}) | Protocols: ${d.clinicProto}<br>
+      Hospital: ${d.hospName} — ${d.hospLoc}`),
+    sec('Steps', d.steps.map((s,i)=>`${i+1}. ${s}`).join('<br>') || '—'),
+    sec('Hazards', (d.hazards.length ? d.hazards.join(', ') : 'None') + (d.otherHaz !== '—' ? `<br>Other: ${d.otherHaz}` : '')),
+    sec('Preventive Measures', d.preventive.map((m,i)=>`${i+1}. ${m}`).join('<br>') || '—'),
+    sec('Ergonomics', d.ergos.join(', ') || 'None'),
+    sec('PPE', (d.ppe.join(', ') || 'None') + (d.otherPPE !== '—' ? ` + ${d.otherPPE}` : '')),
+    sec('Civil Work', `Soil: ${d.soilType} | ${d.excavDepth}<br>Controls: ${d.civilControls.join(', ')||'None'}<br>Utilities Located: ${d.utilLoc} | TX 811: ${d.tx811} | Shut Valves: ${d.shutValves} | Inspected: ${d.excavInsp}`),
+    sec('Reviewer', d.reviewer),
+    sec('Crew', `${d.crew.length} member(s) signed`)
+  ].join('');
+}
+
+// ──────────────────────────────────────────
+// Build the HTML email body (mirrors the PDF layout)
+// ──────────────────────────────────────────
+function buildEmailHTML(d) {
+  const ck = (arr, k) => arr.includes(k) ? '&#x2611;' : '&#x2610;';
+  const ekLabels = {firstAid:'First Aid Kit',stretcher:'Stretcher/Basket/High-Rise Rescue',
+                    msds:'M.S.D.S/S.D.S',evacuation:'Evacuation Points',fireExt:'Fire Extinguisher'};
+  const hdrRow = (label, val) =>
+    `<tr><td style="background:#f2f2f2;font-weight:bold;padding:7px 10px;border:1px solid #ccc;width:160px;font-size:12px">${label}</td>
+         <td style="padding:7px 10px;border:1px solid #ccc;font-size:13px">${val}</td></tr>`;
+  const sectionHdr = t =>
+    `<tr><td colspan="2" style="background:#E8500A;color:#fff;padding:8px 12px;font-weight:bold;font-size:13px;letter-spacing:.5px">${t}</td></tr>`;
+
+  const crewRows = d.crew.map((c,i) => `
+    <tr>
+      <td style="padding:7px 10px;border:1px solid #ccc;font-size:12px">${c.name}</td>
+      <td style="padding:7px 10px;border:1px solid #ccc;font-size:12px">${c.hh}</td>
+      <td style="padding:7px 10px;border:1px solid #ccc">
+        ${c.sig ? `<img src="${c.sig}" style="height:38px;background:#fff;border:1px solid #ddd">` : '<em style="color:#999;font-size:11px">No signature</em>'}
+      </td>
+    </tr>`).join('');
+
+  return `
+  <div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto">
+    <div style="background:#E8500A;color:#fff;padding:18px 20px;text-align:center">
+      <div style="font-size:24px;font-weight:900;letter-spacing:1px">JOB HAZARD ANALYSIS (JHA)</div>
+      <div style="font-size:12px;margin-top:4px;opacity:.9">D. Wilson Construction</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      ${sectionHdr('Project Information')}
+      ${hdrRow('Reviewer', d.reviewer)}
+      ${hdrRow('Company', d.company)}
+      ${hdrRow('Name / Foreman', d.name)}
+      ${hdrRow('Date', d.date)}
+      ${hdrRow('Location', d.location)}
+      ${hdrRow('Scope of Work', d.scope)}
+      ${sectionHdr('Weather Conditions')}
+      ${hdrRow('Weather', d.weather)}
+      ${hdrRow('Temperature', d.temp)}
+      ${hdrRow('Wind', d.wind)}
+      ${hdrRow('Notes', d.wxNotes)}
+      ${sectionHdr('Emergency Procedures')}
+      ${hdrRow('Notify D. Wilson (accident)', d.notifyW)}
+      ${hdrRow('Injured Today', d.injured)}
+      <tr><td colspan="2" style="padding:8px 10px;border:1px solid #ccc;font-size:12px">
+        ${['firstAid','stretcher','msds','evacuation','fireExt'].map(k=>`${ck(d.emergChecks,k)} ${ekLabels[k]}`).join('&nbsp;&nbsp;&nbsp;')}
+      </td></tr>
+      ${hdrRow('Clinic Name', d.clinicName)}
+      ${hdrRow('Clinic Location', d.clinicLoc)}
+      ${hdrRow('Clinic Protocols', d.clinicProto)}
+      ${hdrRow('Nearest Hospital', d.hospName + ' — ' + d.hospLoc)}
+      ${sectionHdr('Steps Involved')}
+      ${d.steps.map((s,i)=>hdrRow(`${i+1}.`,s)).join('')}
+      ${sectionHdr('Potential Hazards Checklist')}
+      <tr><td colspan="2" style="padding:10px;border:1px solid #ccc;font-size:12px;line-height:2">
+        ${d.hazards.length ? d.hazards.map(h=>`<span style="background:#fff5f0;border:1px solid #E8500A;border-radius:3px;padding:2px 7px;margin:2px;display:inline-block">&#x2611; ${h}</span>`).join('') : '<em>None selected</em>'}
+        ${d.otherHaz !== '—' ? `<br><strong>Other:</strong> ${d.otherHaz}` : ''}
+      </td></tr>
+      ${sectionHdr('Preventive Measures for Each Hazard')}
+      ${d.preventive.map((m,i)=>hdrRow(`${i+1}.`,m)).join('')}
+      ${sectionHdr('Ergonomic Risk Factors Identified')}
+      <tr><td colspan="2" style="padding:10px;border:1px solid #ccc;font-size:12px;line-height:2">
+        ${d.ergos.length ? d.ergos.map(e=>`<span style="background:#f5f5f5;border:1px solid #ccc;border-radius:3px;padding:2px 7px;margin:2px;display:inline-block">&#x2611; ${e}</span>`).join('') : '<em>None selected</em>'}
+      </td></tr>
+      ${sectionHdr('PPE Required')}
+      <tr><td colspan="2" style="padding:10px;border:1px solid #ccc;font-size:12px;line-height:2">
+        ${d.ppe.length ? d.ppe.map(p=>`<span style="background:#f5f5f5;border:1px solid #ccc;border-radius:3px;padding:2px 7px;margin:2px;display:inline-block">&#x2611; ${p}</span>`).join('') : '<em>None selected</em>'}
+        ${d.otherPPE !== '—' ? `<br><strong>Additional:</strong> ${d.otherPPE}` : ''}
+      </td></tr>
+      ${sectionHdr('Complete for Civil Work')}
+      ${hdrRow('1. Soil Type', d.soilType || '&nbsp;')}
+      ${hdrRow('&nbsp;&nbsp;&nbsp;Excavation Depth', d.excavDepth || '&nbsp;')}
+      <tr><td style="background:#f2f2f2;font-weight:bold;padding:7px 10px;border:1px solid #ccc;font-size:12px">2. Cave-in Controls</td>
+          <td style="padding:7px 10px;border:1px solid #ccc;font-size:12px">${d.civilControls.join(', ') || '&nbsp;'}</td></tr>
+      ${hdrRow('3. Terrain / Environment', d.terrain || '&nbsp;')}
+      ${hdrRow('4. Vehicle Access Hazards', d.vehicleAccess || '&nbsp;')}
+      ${hdrRow('5. Electrical / Gas', d.elecGas || '&nbsp;')}
+      ${hdrRow('6. Utilities Potholed / Located', d.utilLoc || '&nbsp;')}
+      ${hdrRow('7. Texas 811 Contacted', d.tx811 || '&nbsp;')}
+      ${hdrRow('8. Shut Valves Located', d.shutValves || '&nbsp;')}
+      ${hdrRow('9. Inspected by Competent Person', d.excavInsp || '&nbsp;')}
+      ${hdrRow('10. Weather Conditions', d.civilWx || '&nbsp;')}
+      ${sectionHdr('Crew Member Signatures (Including Subcontractors)')}
+      <tr style="background:#f2f2f2">
+        <td style="padding:8px 10px;border:1px solid #ccc;font-weight:bold;font-size:12px">Printed Name</td>
+        <td style="padding:8px 10px;border:1px solid #ccc;font-weight:bold;font-size:12px">Hard Hat #</td>
+        <td style="padding:8px 10px;border:1px solid #ccc;font-weight:bold;font-size:12px">Signature</td>
+      </tr>
+      ${crewRows}
+    </table>
+    <div style="padding:10px;text-align:center;font-size:10px;color:#999;border-top:1px solid #eee;margin-top:8px">
+      Submitted via D. Wilson Construction JHA Mobile Form &nbsp;|&nbsp; ${new Date().toLocaleString()}
+    </div>
+  </div>`;
+}
+
+// ──────────────────────────────────────────
+// Submit
+// ──────────────────────────────────────────
+async function submitJHA() {
+  document.getElementById('overlay').classList.add('on');
+  document.getElementById('overlayMsg').textContent = 'BUILDING REPORT…';
+
+  const d = collectData();
+  const htmlBody = buildEmailHTML(d);
+
+  document.getElementById('overlayMsg').textContent = 'SENDING EMAIL…';
+
+  try {
+    await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_ID, {
+      to_email:    'omarr@dwilsonconstruction.com',
+      subject:     `JHA — ${d.company} — ${d.name} — ${d.date}`,
+      from_name:   d.name,
+      company:     d.company,
+      date:        d.date,
+      message_html: htmlBody
+    });
+    showSuccess(d.date);
+  } catch(err) {
+    console.warn('EmailJS failed, falling back to mailto:', err);
+    // Fallback: open default mail client with plain-text body
+    fallbackMailto(d);
+    showSuccess(d.date);
+  }
+}
+
+function fallbackMailto(d) {
+  const subject = encodeURIComponent(`JHA — ${d.company} — ${d.name} — ${d.date}`);
+  const ck = (arr,k) => arr.includes(k) ? '[X]' : '[ ]';
+  const ekLabels = {firstAid:'First Aid Kit',stretcher:'Stretcher/Basket/High-Rise Rescue',
+                    msds:'M.S.D.S/S.D.S',evacuation:'Evacuation Points',fireExt:'Fire Extinguisher'};
+  let body = `JOB HAZARD ANALYSIS (JHA)\n${'='.repeat(40)}\n\n`;
+  body += `REVIEWER: ${d.reviewer}\nCOMPANY: ${d.company}\nNAME: ${d.name}\nDATE: ${d.date}\nLOCATION: ${d.location}\n\nSCOPE:\n${d.scope}\n\n`;
+  body += `WEATHER: ${d.weather} | TEMP: ${d.temp} | WIND: ${d.wind}\nNOTES: ${d.wxNotes}\n\n`;
+  body += `EMERGENCY PROCEDURES\n${'─'.repeat(30)}\n`;
+  body += `Notify D. Wilson: ${d.notifyW} | Injured: ${d.injured}\n`;
+  ['firstAid','stretcher','msds','evacuation','fireExt'].forEach(k => body += `${ck(d.emergChecks,k)} ${ekLabels[k]}\n`);
+  body += `Clinic: ${d.clinicName} (${d.clinicLoc}) | Protocols: ${d.clinicProto}\nHospital: ${d.hospName} — ${d.hospLoc}\n\n`;
+  body += `STEPS INVOLVED\n${'─'.repeat(30)}\n${d.steps.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n\n`;
+  body += `POTENTIAL HAZARDS\n${'─'.repeat(30)}\n${d.hazards.map(h=>`[X] ${h}`).join('\n') || 'None'}\nOther: ${d.otherHaz}\n\n`;
+  body += `PREVENTIVE MEASURES\n${'─'.repeat(30)}\n${d.preventive.map((m,i)=>`${i+1}. ${m}`).join('\n') || 'None'}\n\n`;
+  body += `ERGONOMIC RISK FACTORS\n${'─'.repeat(30)}\n${d.ergos.map(e=>`[X] ${e}`).join('\n') || 'None'}\n\n`;
+  body += `PPE REQUIRED\n${'─'.repeat(30)}\n${d.ppe.map(p=>`[X] ${p}`).join('\n') || 'None'}${d.otherPPE !== '—' ? '\nAdditional: '+d.otherPPE : ''}\n\n`;
+  body += `CIVIL WORK\n${'─'.repeat(30)}\n`;
+  if (!d.soilType && !d.excavDepth) {
+    body += `N/A — Civil work not applicable for today's scope\n\n`;
+  } else {
+    body += `1. ${d.soilType} | ${d.excavDepth}\n2. Controls: ${d.civilControls.join(', ')||'None'}\n3. Terrain: ${d.terrain}\n4. Vehicle Access: ${d.vehicleAccess}\n5. Elec/Gas: ${d.elecGas}\n6. Utilities Located: ${d.utilLoc}\n7. TX 811: ${d.tx811}\n8. Shut Valves: ${d.shutValves}\n9. Inspected: ${d.excavInsp}\n10. Weather: ${d.civilWx}\n\n`;
+  }
+  body += `CREW MEMBERS\n${'─'.repeat(30)}\n${d.crew.map((c,i)=>`${i+1}. ${c.name} | Hard Hat: ${c.hh} | Signature: [Digital Pad]`).join('\n')}\n\n`;
+  body += `[Submitted via D. Wilson Construction JHA Mobile Form]`;
+
+  window.location.href = `mailto:omarr@dwilsonconstruction.com?subject=${subject}&body=${encodeURIComponent(body)}`;
+}
+
+function showSuccess(date) {
+  document.getElementById('overlay').classList.remove('on');
+  document.getElementById('mainHdr').style.display = 'none';
+  document.getElementById('navBar').style.display = 'none';
+  document.querySelectorAll('.sec').forEach(s => s.style.display = 'none');
+  document.getElementById('successSc').classList.add('on');
+  document.getElementById('succDate').textContent = date;
+}
+
+// ──────────────────────────────────────────
+// Init
+// ──────────────────────────────────────────
+document.getElementById('fdate').value = new Date().toISOString().split('T')[0];
+addCrew(); // start with 1 crew member
+render();
+</script>
+</body>
+</html>
