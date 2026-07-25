@@ -101,8 +101,7 @@ def submit_jha():
                         f'attachment; filename="{filename}"')
         msg.attach(part)
 
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
-            server.starttls()
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(SMTP_USER, SMTP_PASS)
             server.sendmail(SMTP_USER, TO_EMAIL, msg.as_string())
         print("Email sent successfully!", flush=True)
