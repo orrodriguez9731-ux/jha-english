@@ -1,39 +1,31 @@
 """
 server.py — JHA PDF Generator API for Render.com
+Uses SendGrid HTTPS API to send email (avoids Render's SMTP port block)
 """
 import json
 import os
-import smtplib
+import base64
 import tempfile
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
+import urllib.request
+import urllib.error
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# ── Allow CORS from GitHub Pages and all origins ──────────────
-ALLOWED_ORIGINS = [
-    'https://orrodriguez9731-ux.github.io',
-    'http://localhost',
-    'http://127.0.0.1',
-]
-
+# ── CORS ──────────────────────────────────────────────────────
 def add_cors(response):
-    origin = request.headers.get('Origin', '*')
-    response.headers['Access-Control-Allow-Origin']  = origin if origin in ALLOWED_ORIGINS else '*'
+    response.headers['Access-Control-Allow-Origin']  = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
     response.headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
-    response.headers['Access-Control-Max-Age']       = '3600'
     return response
 
 app.after_request(add_cors)
 
-# ── Email credentials ──────────────────────────────────────────
-SMTP_USER = "orrodriguez9731@gmail.com"
-SMTP_PASS = "xzbp grbw kxix onmc"
-TO_EMAIL  = "omarr@dwilsonconstruction.com"
+# ── Credentials ────────────────────────────────────────────────
+SENDGRID_API_KEY = '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'
+FROM_EMAIL       = 'orrodriguez9731@gmail.com'
+FROM_NAME        = 'D. Wilson Construction JHA'
+TO_EMAIL         = 'omarr@dwilsonconstruction.com'
 
 # ── Health check ───────────────────────────────────────────────
 @app.route('/', methods=['GET'])
@@ -61,7 +53,7 @@ def submit_jha():
         date_str = data.get('date',     'Unknown')
         print(f"Received JHA: {company} / {name} / {date_str}", flush=True)
 
-        # Build the PDF
+        # ── Build the PDF ──────────────────────────────────────
         print("Building PDF...", flush=True)
         with tempfile.NamedTemporaryFile(suffix='.json', mode='w',
                                          delete=False) as jf:
@@ -69,20 +61,20 @@ def submit_jha():
             json_path = jf.name
 
         pdf_path = json_path.replace('.json', '.pdf')
-
         from build_jha_pdf import build
         build(json_path, pdf_path)
         print(f"PDF built: {pdf_path}", flush=True)
 
-        # Email the PDF
-        print(f"Sending email to {TO_EMAIL}...", flush=True)
-        subject = f"JHA — {company} — {name} — {date_str}"
-        msg = MIMEMultipart()
-        msg['From']    = SMTP_USER
-        msg['To']      = TO_EMAIL
-        msg['Subject'] = subject
+        # ── Read PDF as base64 for SendGrid attachment ─────────
+        with open(pdf_path, 'rb') as pf:
+            pdf_b64 = base64.b64encode(pf.read()).decode('utf-8')
 
-        body = (
+        filename = f"JHA_{company.replace(' ','_')}_{date_str}.pdf"
+
+        # ── Send via SendGrid HTTPS API ────────────────────────
+        print("Sending email via SendGrid...", flush=True)
+        subject = f"JHA — {company} — {name} — {date_str}"
+        body_text = (
             f"Job Hazard Analysis submitted.\n\n"
             f"Company:  {company}\n"
             f"Foreman:  {name}\n"
@@ -90,32 +82,50 @@ def submit_jha():
             f"Location: {data.get('location', '')}\n\n"
             f"See attached PDF for the complete filled-out JHA."
         )
-        msg.attach(MIMEText(body, 'plain'))
 
-        filename = f"JHA_{company.replace(' ','_')}_{date_str}.pdf"
-        with open(pdf_path, 'rb') as pf:
-            part = MIMEBase('application', 'octet-stream')
-            part.set_payload(pf.read())
-        encoders.encode_base64(part)
-        part.add_header('Content-Disposition',
-                        f'attachment; filename="{filename}"')
-        msg.attach(part)
+        payload = json.dumps({
+            "personalizations": [{"to": [{"email": TO_EMAIL}]}],
+            "from": {"email": FROM_EMAIL, "name": FROM_NAME},
+            "subject": subject,
+            "content": [{"type": "text/plain", "value": body_text}],
+            "attachments": [{
+                "content":     pdf_b64,
+                "type":        "application/pdf",
+                "filename":    filename,
+                "disposition": "attachment"
+            }]
+        }).encode('utf-8')
 
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(SMTP_USER, SMTP_PASS)
-            server.sendmail(SMTP_USER, TO_EMAIL, msg.as_string())
-        print("Email sent successfully!", flush=True)
+        req = urllib.request.Request(
+            'https://api.sendgrid.com/v3/mail/send',
+            data=payload,
+            headers={
+                'Authorization': f'Bearer {SENDGRID_API_KEY}',
+                'Content-Type':  'application/json'
+            },
+            method='POST'
+        )
 
-        # Clean up
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            status = resp.status
+            print(f"SendGrid response: {status}", flush=True)
+
+        # Clean up temp files
         try:
             os.unlink(json_path)
             os.unlink(pdf_path)
         except Exception:
             pass
 
+        print("Email sent successfully!", flush=True)
         return jsonify({"success": True,
                         "message": "PDF emailed successfully"}), 200
 
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode()
+        print(f"SendGrid error {e.code}: {err_body}", flush=True)
+        return jsonify({"success": False,
+                        "error": f"Email error {e.code}: {err_body}"}), 500
     except Exception as e:
         print(f"ERROR: {e}", flush=True)
         import traceback
