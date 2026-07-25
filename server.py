@@ -23,8 +23,8 @@ def add_cors(response):
 app.after_request(add_cors)
 
 # ── Email credentials ──────────────────────────────────────────
-SMTP_USER = "dwilsonjha@gmail.com"        # ← your Gmail
-SMTP_PASS = "xxxx xxxx xxxx xxxx"         # ← your App Password
+SMTP_USER = "orrodriguez9731@gmail.com"
+SMTP_PASS = "xzbp grbw kxix onmc"
 TO_EMAIL  = "omarr@dwilsonconstruction.com"
 
 # ── Health check ───────────────────────────────────────────────
