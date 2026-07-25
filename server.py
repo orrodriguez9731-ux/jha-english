@@ -22,7 +22,7 @@ def add_cors(response):
 app.after_request(add_cors)
 
 # ── Credentials ────────────────────────────────────────────────
-SENDGRID_API_KEY = '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'
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '')
 FROM_EMAIL       = 'orrodriguez9731@gmail.com'
 FROM_NAME        = 'D. Wilson Construction JHA'
 TO_EMAIL         = 'omarr@dwilsonconstruction.com'
