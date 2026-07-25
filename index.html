@@ -9,7 +9,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
 
 :root {
-  --orange: #E8500A;
+  --orange: #1A56DB;
   --dark: #181818;
   --mid: #262626;
   --card: #2E2E2E;
@@ -126,7 +126,7 @@ input.req-err, textarea.req-err { border-color: var(--red) !important; }
   display: flex; align-items: center; gap: 9px;
   cursor: pointer; transition: all .15s;
 }
-.ckitem.on { background: rgba(232,80,10,.13); border-color: var(--orange); }
+.ckitem.on { background: rgba(26,86,219,.13); border-color: var(--orange); }
 .ckitem input { display: none; }
 .ckbox {
   width: 20px; height: 20px; border: 2px solid var(--border);
@@ -196,7 +196,7 @@ canvas.sigpad {
   padding: 2px 8px; cursor: pointer; font-family: 'Barlow', sans-serif;
 }
 .add-crew {
-  width: 100%; background: rgba(232,80,10,.08);
+  width: 100%; background: rgba(26,86,219,.08);
   border: 2px dashed var(--orange); border-radius: 8px;
   color: var(--orange); font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700; font-size: .95rem; letter-spacing: 1px;
@@ -358,8 +358,8 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
     <div class="rbtn" data-g="clinicProto" data-v="Yes">Yes</div>
     <div class="rbtn" data-g="clinicProto" data-v="No">No</div>
   </div>
-  <div class="fld"><label class="lbl">Nearest Hospital Name</label><input type="text" id="hospName" placeholder="Hospital name"></div>
-  <div class="fld"><label class="lbl">Nearest Hospital Location</label><input type="text" id="hospLoc" placeholder="Hospital address"></div>
+  <div class="fld"><label class="lbl">Nearest Hospital Name</label><input type="text" id="hospName" placeholder="Hospital name" value="Knapp Medical Center"></div>
+  <div class="fld"><label class="lbl">Nearest Hospital Location</label><input type="text" id="hospLoc" placeholder="Hospital address" value="1401 E 8th St, Weslaco, TX 78596"></div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -447,7 +447,7 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
   <div class="sec-title"><div class="sec-icon">🛡️</div>Preventive Measures</div>
 
   <!-- Selected hazards reference panel — populated by JS on render -->
-  <div id="hazardRef" style="background:rgba(232,80,10,0.08);border:1px solid rgba(232,80,10,0.3);border-radius:8px;padding:11px 13px;margin-bottom:16px">
+  <div id="hazardRef" style="background:rgba(26,86,219,0.08);border:1px solid rgba(26,86,219,0.3);border-radius:8px;padding:11px 13px;margin-bottom:16px">
     <p style="font-size:.7rem;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">⚠️ Hazards Selected — Address Each Below</p>
     <div id="hazardRefList" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     <p id="hazardRefEmpty" style="font-size:.78rem;color:var(--muted);display:none;font-style:italic">No hazards selected — go back to Potential Hazards to make selections.</p>
@@ -607,11 +607,24 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
 <div class="success" id="successSc">
   <div class="ico">✅</div>
   <h2>JHA Submitted!</h2>
-  <p>Your Job Hazard Analysis has been emailed to<br><strong>omarr@dwilsonconstruction.com</strong></p>
+  <p>Job Hazard Analysis for <strong id="succDate"></strong></p>
   <br>
-  <p>Date: <strong id="succDate"></strong></p>
+  <p id="succStatus" style="font-size:.85rem;margin-bottom:16px"></p>
+
+  <!-- PDF Download -->
+  <a id="succPdfBtn" href="#" style="display:none;background:var(--orange);color:#fff;text-decoration:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:1px;text-align:center;margin-bottom:12px">
+    📄 DOWNLOAD FILLED PDF
+  </a>
+
   <br>
-  <p style="font-size:.8rem;color:var(--muted)">Screenshot this screen for your records.</p>
+
+  <!-- SMS -->
+  <div style="background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.35);border-radius:10px;padding:13px 15px;margin-bottom:16px;text-align:left">
+    <p style="font-size:.75rem;font-weight:700;color:var(--green);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">📲 Text Notification</p>
+    <p style="font-size:.82rem;color:var(--light);line-height:1.5">Summary being sent to <strong>(956) 435-2102</strong>. If messaging didn't open automatically, tap below.</p>
+  </div>
+  <a id="succSmsBtn" href="#" style="display:block;background:var(--green);color:#fff;text-decoration:none;padding:14px;border-radius:10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:1px;text-align:center;margin-bottom:12px">💬 SEND TEXT NOW</a>
+  <p style="font-size:.75rem;color:var(--muted)">Screenshot this screen for your records.</p>
 </div>
 
 <!-- NAV -->
@@ -711,8 +724,8 @@ function buildHazardRef() {
     const tag = document.createElement('span');
     tag.textContent = h;
     tag.style.cssText = `
-      background: rgba(232,80,10,0.18);
-      border: 1px solid rgba(232,80,10,0.5);
+      background: rgba(26,86,219,0.18);
+      border: 1px solid rgba(26,86,219,0.5);
       border-radius: 5px;
       padding: 3px 9px;
       font-size: .73rem;
@@ -922,7 +935,7 @@ function buildEmailHTML(d) {
     `<tr><td style="background:#f2f2f2;font-weight:bold;padding:7px 10px;border:1px solid #ccc;width:160px;font-size:12px">${label}</td>
          <td style="padding:7px 10px;border:1px solid #ccc;font-size:13px">${val}</td></tr>`;
   const sectionHdr = t =>
-    `<tr><td colspan="2" style="background:#E8500A;color:#fff;padding:8px 12px;font-weight:bold;font-size:13px;letter-spacing:.5px">${t}</td></tr>`;
+    `<tr><td colspan="2" style="background:#1A56DB;color:#fff;padding:8px 12px;font-weight:bold;font-size:13px;letter-spacing:.5px">${t}</td></tr>`;
 
   const crewRows = d.crew.map((c,i) => `
     <tr>
@@ -935,7 +948,7 @@ function buildEmailHTML(d) {
 
   return `
   <div style="font-family:Arial,sans-serif;max-width:820px;margin:0 auto">
-    <div style="background:#E8500A;color:#fff;padding:18px 20px;text-align:center">
+    <div style="background:#1A56DB;color:#fff;padding:18px 20px;text-align:center">
       <div style="font-size:24px;font-weight:900;letter-spacing:1px">JOB HAZARD ANALYSIS (JHA)</div>
       <div style="font-size:12px;margin-top:4px;opacity:.9">D. Wilson Construction</div>
     </div>
@@ -966,7 +979,7 @@ function buildEmailHTML(d) {
       ${d.steps.map((s,i)=>hdrRow(`${i+1}.`,s)).join('')}
       ${sectionHdr('Potential Hazards Checklist')}
       <tr><td colspan="2" style="padding:10px;border:1px solid #ccc;font-size:12px;line-height:2">
-        ${d.hazards.length ? d.hazards.map(h=>`<span style="background:#fff5f0;border:1px solid #E8500A;border-radius:3px;padding:2px 7px;margin:2px;display:inline-block">&#x2611; ${h}</span>`).join('') : '<em>None selected</em>'}
+        ${d.hazards.length ? d.hazards.map(h=>`<span style="background:#eff5ff;border:1px solid #1A56DB;border-radius:3px;padding:2px 7px;margin:2px;display:inline-block">&#x2611; ${h}</span>`).join('') : '<em>None selected</em>'}
         ${d.otherHaz !== '—' ? `<br><strong>Other:</strong> ${d.otherHaz}` : ''}
       </td></tr>
       ${sectionHdr('Preventive Measures for Each Hazard')}
@@ -1012,67 +1025,115 @@ function buildEmailHTML(d) {
 // ──────────────────────────────────────────
 async function submitJHA() {
   document.getElementById('overlay').classList.add('on');
-  document.getElementById('overlayMsg').textContent = 'BUILDING REPORT…';
+  document.getElementById('overlayMsg').textContent = 'BUILDING PDF…';
 
   const d = collectData();
-  const htmlBody = buildEmailHTML(d);
 
-  document.getElementById('overlayMsg').textContent = 'SENDING EMAIL…';
+  document.getElementById('overlayMsg').textContent = 'SENDING JHA…';
+
+  // Strip signature image data — too large for serverless, not needed for PDF text layout
+  const payload = JSON.parse(JSON.stringify(d));
+  if (payload.crew) payload.crew = payload.crew.map(c => ({ name: c.name, hh: c.hh }));
+
+  let pdfBase64 = null;
+  let serverSuccess = false;
 
   try {
-    await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_ID, {
-      to_email:    'omarr@dwilsonconstruction.com',
-      subject:     `JHA — ${d.company} — ${d.name} — ${d.date}`,
-      from_name:   d.name,
-      company:     d.company,
-      date:        d.date,
-      message_html: htmlBody
+    const resp = await fetch('https://jha-pdf-server.onrender.com/submit-jha', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
     });
-    showSuccess(d.date);
+    if (resp.ok) {
+      const result = await resp.json();
+      pdfBase64 = result.pdf || null;
+      serverSuccess = result.success === true;
+    }
   } catch(err) {
-    console.warn('EmailJS failed, falling back to mailto:', err);
-    // Fallback: open default mail client with plain-text body
-    fallbackMailto(d);
-    showSuccess(d.date);
+    console.warn('Netlify function unavailable:', err.message);
   }
-}
 
-function fallbackMailto(d) {
-  const subject = encodeURIComponent(`JHA — ${d.company} — ${d.name} — ${d.date}`);
-  const ck = (arr,k) => arr.includes(k) ? '[X]' : '[ ]';
-  const ekLabels = {firstAid:'First Aid Kit',stretcher:'Stretcher/Basket/High-Rise Rescue',
-                    msds:'M.S.D.S/S.D.S',evacuation:'Evacuation Points',fireExt:'Fire Extinguisher'};
-  let body = `JOB HAZARD ANALYSIS (JHA)\n${'='.repeat(40)}\n\n`;
-  body += `REVIEWER: ${d.reviewer}\nCOMPANY: ${d.company}\nNAME: ${d.name}\nDATE: ${d.date}\nLOCATION: ${d.location}\n\nSCOPE:\n${d.scope}\n\n`;
-  body += `WEATHER: ${d.weather} | TEMP: ${d.temp} | WIND: ${d.wind}\nNOTES: ${d.wxNotes}\n\n`;
-  body += `EMERGENCY PROCEDURES\n${'─'.repeat(30)}\n`;
-  body += `Notify D. Wilson: ${d.notifyW} | Injured: ${d.injured}\n`;
-  ['firstAid','stretcher','msds','evacuation','fireExt'].forEach(k => body += `${ck(d.emergChecks,k)} ${ekLabels[k]}\n`);
-  body += `Clinic: ${d.clinicName} (${d.clinicLoc}) | Protocols: ${d.clinicProto}\nHospital: ${d.hospName} — ${d.hospLoc}\n\n`;
-  body += `STEPS INVOLVED\n${'─'.repeat(30)}\n${d.steps.map((s,i)=>`${i+1}. ${s}`).join('\n')}\n\n`;
-  body += `POTENTIAL HAZARDS\n${'─'.repeat(30)}\n${d.hazards.map(h=>`[X] ${h}`).join('\n') || 'None'}\nOther: ${d.otherHaz}\n\n`;
-  body += `PREVENTIVE MEASURES\n${'─'.repeat(30)}\n${d.preventive.map((m,i)=>`${i+1}. ${m}`).join('\n') || 'None'}\n\n`;
-  body += `ERGONOMIC RISK FACTORS\n${'─'.repeat(30)}\n${d.ergos.map(e=>`[X] ${e}`).join('\n') || 'None'}\n\n`;
-  body += `PPE REQUIRED\n${'─'.repeat(30)}\n${d.ppe.map(p=>`[X] ${p}`).join('\n') || 'None'}${d.otherPPE !== '—' ? '\nAdditional: '+d.otherPPE : ''}\n\n`;
-  body += `CIVIL WORK\n${'─'.repeat(30)}\n`;
-  if (!d.soilType && !d.excavDepth) {
-    body += `N/A — Civil work not applicable for today's scope\n\n`;
-  } else {
-    body += `1. ${d.soilType} | ${d.excavDepth}\n2. Controls: ${d.civilControls.join(', ')||'None'}\n3. Terrain: ${d.terrain}\n4. Vehicle Access: ${d.vehicleAccess}\n5. Elec/Gas: ${d.elecGas}\n6. Utilities Located: ${d.utilLoc}\n7. TX 811: ${d.tx811}\n8. Shut Valves: ${d.shutValves}\n9. Inspected: ${d.excavInsp}\n10. Weather: ${d.civilWx}\n\n`;
-  }
-  body += `CREW MEMBERS\n${'─'.repeat(30)}\n${d.crew.map((c,i)=>`${i+1}. ${c.name} | Hard Hat: ${c.hh} | Signature: [Digital Pad]`).join('\n')}\n\n`;
-  body += `[Submitted via D. Wilson Construction JHA Mobile Form]`;
+  // SMS notification
+  const smsBody = buildSMSText(d);
+  const smsURL  = `sms:+19564352102?body=${encodeURIComponent(smsBody)}`;
 
-  window.location.href = `mailto:omarr@dwilsonconstruction.com?subject=${subject}&body=${encodeURIComponent(body)}`;
-}
-
-function showSuccess(date) {
   document.getElementById('overlay').classList.remove('on');
+  showSuccess(d.date, smsURL, serverSuccess, pdfBase64,
+              `JHA_${(d.company||'').replace(/\s+/g,'_')}_${(d.date||'').replace(/\//g,'-')}.pdf`);
+}
+
+// ──────────────────────────────────────────
+// Build SMS text — compact JHA summary
+// ──────────────────────────────────────────
+function buildSMSText(d) {
+  const ck = (arr,k) => arr.includes(k) ? '[X]' : '[ ]';
+  let t = `✅ JHA SUBMITTED\n`;
+  t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  t += `📅 ${d.date}\n`;
+  t += `🏢 ${d.company}\n`;
+  t += `👷 ${d.name}\n`;
+  t += `📍 ${d.location}\n`;
+  t += `📋 Scope: ${d.scope}\n`;
+  t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  t += `🌤 Weather: ${d.weather} | ${d.temp} | Wind: ${d.wind}\n`;
+  t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  t += `🚨 Notify D. Wilson: ${d.notifyW} | Injured: ${d.injured}\n`;
+  t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  if (d.steps.length) {
+    t += `🔢 STEPS:\n${d.steps.map((s,i)=>`  ${i+1}. ${s}`).join('\n')}\n`;
+    t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  }
+  if (d.hazards.length) {
+    t += `⚠️ HAZARDS:\n${d.hazards.map(h=>`  • ${h}`).join('\n')}\n`;
+    t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  }
+  if (d.preventive.length) {
+    t += `🛡 PREVENTIVE MEASURES:\n${d.preventive.map((m,i)=>`  ${i+1}. ${m}`).join('\n')}\n`;
+    t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  }
+  if (d.ppe.length) {
+    t += `🦺 PPE: ${d.ppe.join(', ')}${d.otherPPE !== '—' ? ', '+d.otherPPE : ''}\n`;
+    t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  }
+  t += `👷 CREW (${d.crew.length}):\n${d.crew.map((c,i)=>`  ${i+1}. ${c.name} | HH# ${c.hh}`).join('\n')}\n`;
+  t += `━━━━━━━━━━━━━━━━━━━━\n`;
+  t += `Reviewer: ${d.reviewer}\n`;
+  t += `[D. Wilson Construction JHA]`;
+  return t;
+}
+
+function showSuccess(date, smsURL, emailSent, pdfBase64, filename) {
   document.getElementById('mainHdr').style.display = 'none';
   document.getElementById('navBar').style.display = 'none';
   document.querySelectorAll('.sec').forEach(s => s.style.display = 'none');
-  document.getElementById('successSc').classList.add('on');
+
   document.getElementById('succDate').textContent = date;
+  document.getElementById('succSmsBtn').href = smsURL;
+
+  // Wire up PDF download button if we got a PDF back
+  const dlBtn = document.getElementById('succPdfBtn');
+  if (pdfBase64 && dlBtn) {
+    const bytes = Uint8Array.from(atob(pdfBase64), c => c.charCodeAt(0));
+    const blob  = new Blob([bytes], { type: 'application/pdf' });
+    const url   = URL.createObjectURL(blob);
+    dlBtn.href     = url;
+    dlBtn.download = filename || 'JHA.pdf';
+    dlBtn.style.display = 'block';
+  }
+
+  // Update status text
+  const statusEl = document.getElementById('succStatus');
+  if (statusEl) {
+    statusEl.textContent = emailSent
+      ? '✅ PDF emailed to omarr@dwilsonconstruction.com'
+      : '⚠️ Use the download button below to save your PDF, then email it manually.';
+    statusEl.style.color = emailSent ? 'var(--green)' : 'var(--accent)';
+  }
+
+  document.getElementById('successSc').classList.add('on');
+
+  // Auto-open SMS after short delay
+  setTimeout(() => { window.location.href = smsURL; }, 1400);
 }
 
 // ──────────────────────────────────────────
