@@ -25,9 +25,6 @@ def build(data_path, out_path):
 
     c = rl_canvas.Canvas(out_path, pagesize=letter)
 
-SMTP_USER = orrodriguez9731@gmail.com
-SMTP_PASS = xzbp grbw kxix onmc
-
     def txt(x, y, s, sz=8, bold=False, col=BLACK, align='left'):
         c.setFont('Helvetica-Bold' if bold else 'Helvetica', sz)
         c.setFillColor(col)
