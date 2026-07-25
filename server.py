@@ -13,11 +13,19 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# ── Allow CORS manually (no flask-cors dependency) ────────────
+# ── Allow CORS from GitHub Pages and all origins ──────────────
+ALLOWED_ORIGINS = [
+    'https://orrodriguez9731-ux.github.io',
+    'http://localhost',
+    'http://127.0.0.1',
+]
+
 def add_cors(response):
-    response.headers['Access-Control-Allow-Origin']  = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    origin = request.headers.get('Origin', '*')
+    response.headers['Access-Control-Allow-Origin']  = origin if origin in ALLOWED_ORIGINS else '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
     response.headers['Access-Control-Allow-Methods'] = 'POST, GET, OPTIONS'
+    response.headers['Access-Control-Max-Age']       = '3600'
     return response
 
 app.after_request(add_cors)
@@ -36,18 +44,25 @@ def health():
 @app.route('/submit-jha', methods=['POST', 'OPTIONS'])
 def submit_jha():
     if request.method == 'OPTIONS':
-        return jsonify({'status': 'ok'}), 200
+        response = jsonify({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin']  = '*'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        return response, 200
 
     try:
         data = request.get_json(force=True)
         if not data:
+            print("ERROR: No JSON data received", flush=True)
             return jsonify({"success": False, "error": "No data received"}), 400
 
         company  = data.get('company',  'Unknown')
         name     = data.get('name',     'Unknown')
         date_str = data.get('date',     'Unknown')
+        print(f"Received JHA: {company} / {name} / {date_str}", flush=True)
 
         # Build the PDF
+        print("Building PDF...", flush=True)
         with tempfile.NamedTemporaryFile(suffix='.json', mode='w',
                                          delete=False) as jf:
             json.dump(data, jf)
@@ -57,8 +72,10 @@ def submit_jha():
 
         from build_jha_pdf import build
         build(json_path, pdf_path)
+        print(f"PDF built: {pdf_path}", flush=True)
 
         # Email the PDF
+        print(f"Sending email to {TO_EMAIL}...", flush=True)
         subject = f"JHA — {company} — {name} — {date_str}"
         msg = MIMEMultipart()
         msg['From']    = SMTP_USER
@@ -88,6 +105,7 @@ def submit_jha():
             server.starttls()
             server.login(SMTP_USER, SMTP_PASS)
             server.sendmail(SMTP_USER, TO_EMAIL, msg.as_string())
+        print("Email sent successfully!", flush=True)
 
         # Clean up
         try:
@@ -100,7 +118,9 @@ def submit_jha():
                         "message": "PDF emailed successfully"}), 200
 
     except Exception as e:
-        print(f"Error: {e}", flush=True)
+        print(f"ERROR: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
         return jsonify({"success": False, "error": str(e)}), 500
 
 
