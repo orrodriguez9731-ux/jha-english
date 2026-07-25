@@ -1039,7 +1039,7 @@ async function submitJHA() {
   let serverSuccess = false;
 
   try {
-    const resp = await fetch('https://jha-pdf-server.onrender.com/submit-jha', {
+    const resp = await fetch('https://jha-english.onrender.com/submit-jha', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(payload),
