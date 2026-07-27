@@ -276,9 +276,29 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
 <div class="toast" id="toast">Please fill in required fields</div>
 
 <!-- ══════════════════════════════════════════
+     LANGUAGE SELECTOR — shown first
+══════════════════════════════════════════ -->
+<div class="sec on" id="s0" style="padding-top:40px;text-align:center">
+  <div style="margin-bottom:24px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:2rem;color:var(--light);letter-spacing:1px">D. Wilson</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase">Construction</div>
+  </div>
+  <div style="background:var(--mid);border:1.5px solid var(--border);border-radius:12px;padding:20px 16px;margin-bottom:10px">
+    <div style="font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">Select Language / Seleccione Idioma</div>
+    <button onclick="setLang('en')" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:18px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:2px;cursor:pointer;margin-bottom:12px;display:block">
+      🇺🇸 ENGLISH
+    </button>
+    <button onclick="setLang('es')" style="width:100%;background:var(--mid);color:var(--light);border:2px solid var(--orange);border-radius:10px;padding:18px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:2px;cursor:pointer;display:block">
+      🇲🇽 ESPAÑOL
+    </button>
+  </div>
+  <p style="font-size:.75rem;color:var(--muted);margin-top:12px">Job Hazard Analysis (JHA)</p>
+</div>
+
+<!-- ══════════════════════════════════════════
      SECTION 1 — Basic Info
 ══════════════════════════════════════════ -->
-<div class="sec on" id="s1">
+<div class="sec" id="s1">
   <div class="sec-title"><div class="sec-icon">🏢</div>Basic Info</div>
   <div class="fld"><label class="lbl">Company *</label><input type="text" id="company" placeholder="Company name"></div>
   <div class="fld"><label class="lbl">Foreman / Name *</label><input type="text" id="fname" placeholder="Full name"></div>
@@ -888,6 +908,7 @@ function collectData() {
     utilLoc: civilIsNA() ? '' : getRadio('utilLoc'), tx811: civilIsNA() ? '' : getRadio('tx811'),
     shutValves: civilIsNA() ? '' : getRadio('shutValves'), excavInsp: civilIsNA() ? '' : getRadio('excavInsp'), civilWx: civilIsNA() ? '' : v('civilWx'),
     reviewer: v('reviewer'),
+    lang: LANG,
     crew
   };
 }
@@ -1031,9 +1052,9 @@ async function submitJHA() {
 
   document.getElementById('overlayMsg').textContent = 'SENDING JHA…';
 
-  // Strip signature image data — too large for serverless, not needed for PDF text layout
+  // Include crew data WITH signatures for PDF rendering
   const payload = JSON.parse(JSON.stringify(d));
-  if (payload.crew) payload.crew = payload.crew.map(c => ({ name: c.name, hh: c.hh }));
+  // Signatures are already included in d.crew[].sig from collectData()
 
   let pdfBase64 = null;
   let serverSuccess = false;
@@ -1141,7 +1162,475 @@ function showSuccess(date, smsURL, emailSent, pdfBase64, filename) {
 // ──────────────────────────────────────────
 document.getElementById('fdate').value = new Date().toISOString().split('T')[0];
 addCrew(); // start with 1 crew member
-render();
+// Start on language selector (s0), hide nav buttons
+document.getElementById('navBar').style.display = 'none';
+document.getElementById('mainHdr').style.display = 'none';
+
+// ──────────────────────────────────────────
+// Translation dictionary
+// ──────────────────────────────────────────
+let LANG = 'en';
+
+const T = {
+  en: {
+    hdrTitle: 'Job Hazard Analysis', hdrSub: 'D. Wilson Construction',
+    submitBtn: '📤 SUBMIT JHA', nextBtn: 'NEXT →', backBtn: '← BACK',
+    overlayMsg: 'SUBMITTING...', overlayBuilding: 'BUILDING PDF…', overlaySending: 'SENDING JHA…',
+    // Section titles
+    s1title: 'Basic Info', s2title: 'Scope of Work', s3title: 'Weather Conditions',
+    s4title: 'Emergency Procedures', s5title: 'Steps Involved', s6title: 'Potential Hazards',
+    s7title: 'Preventive Measures', s8title: 'Ergonomic Risk Factors', s9title: 'PPE Required',
+    s10title: 'Civil Work', s15title: 'JHA Reviewer', s16title: 'Crew Signatures', s17title: 'Review & Submit',
+    // Section 1
+    company: 'Company *', fname: 'Foreman / Name *', fdate: 'Date *', location: 'Location *',
+    companyPH: 'Company name', fnamePH: 'Full name', locationPH: 'Job site address / description',
+    // Section 2
+    scopeLbl: "Describe today's scope of work *", scopePH: 'What work will be performed today?',
+    // Section 3
+    weatherLbl: 'Weather', tempLbl: 'Temperature (°F)', tempPH: 'e.g. 92°F',
+    windLbl: 'Wind', notesLbl: 'Notes', notesPH: 'Additional weather notes...',
+    wxOther: 'Other', windVL: 'Very Light', windW: 'Windy', windVW: 'Very Windy',
+    // Section 4
+    emergInfo: '⚠️ Complete all emergency info before work begins.',
+    notifyQ: 'Are you aware to notify D. Wilson in case of accident?',
+    injuredQ: 'Were you injured today?',
+    locationsLbl: 'Locations Confirmed',
+    firstAidLbl: 'First Aid Kit Location – DWCC office',
+    stretcherLbl: 'Stretcher / Basket / High-Rise Rescue – N/A',
+    msdsLbl: 'M.S.D.S / S.D.S Location – DWCC office',
+    evacuationLbl: 'Evacuation Points – Parking Lot',
+    fireExtLbl: 'Fire Extinguisher – Renovated Spaces / RR',
+    clinicNameLbl: 'Clinic Name', clinicLocLbl: 'Clinic Location',
+    clinicProtoQ: 'I know where the clinic is located',
+    hospNameLbl: 'Nearest Hospital Name', hospLocLbl: 'Nearest Hospital Location',
+    yes: 'Yes', no: 'No',
+    // Section 5
+    stepsSubtitle: 'List the steps involved in preparing for your work (up to 5).',
+    stepsEx: 'Examples',
+    stepsExText: '<span style="color:var(--light);font-weight:600">Painter</span> — Scope: paint walls / Steps: locate wash and water area, tape up surrounding areas, clean surfaces after work is done<br><span style="color:var(--light);font-weight:600">Drywall</span> — Scope: frame walls / Steps: gather material, lay out and frame walls, general clean up<br><span style="color:var(--light);font-weight:600">HVAC</span> — Scope: demo ductwork / Steps: gather ladder and tools, identify hazards overhead, remove ductwork, remove trash from building, and clean',
+    step: 'Step',
+    // Section 6
+    hazSubtitle: 'Check ALL hazards related to the scope of work today.',
+    otherHazLbl: 'Other Hazards', otherHazPH: 'Other hazards...',
+    // Section 7
+    pmSubtitle: 'List preventive measures for each identified hazard (up to 8).',
+    pmPH: 'Preventive measure',
+    // Section 8
+    ergoSubtitle: 'Check all ergonomic risk factors identified.',
+    // Section 9
+    ppeSubtitle: 'Select all PPE required for today\'s work.',
+    otherPPELbl: 'Additional PPE', otherPPEPH: 'e.g. gloves, respirator...',
+    // Section 10
+    civilInfo: "⚙️ Engineer-Approved Trenching Plan required for trenches >5 ft.",
+    civilQ: "Does today's work include civil / excavation work?",
+    civilNA: 'N/A — Skip', civilYes: 'Yes',
+    soilLbl: '1. Type and Depth of Excavations',
+    excavDepthLbl: 'Excavation Depth Description', excavDepthPH: 'Describe depth and type of excavation…',
+    caveInLbl: '2. Cave-in / Engulfment Control Measures (Trenches >5 ft)',
+    terrainLbl: '3. Elevation / Site Terrain / Environmental Concerns / Hazards', terrainPH: 'Describe elevation, terrain, environmental hazards…',
+    vehicleLbl: '4. Hazards with Site / Vehicle Access', vehiclePH: 'High traffic, heavy haul, boom cranes, storage of materials/HAZMAT…',
+    elecGasLbl: '5. Electrical or Gas Concerns / Hazards', elecGasPH: 'e.g. Electrical/Gas/Fiber Optic line…',
+    utilLocQ: '6. Have existing utilities been potholed / located?',
+    tx811Q: '7. Has Texas 811 hotline been contacted?',
+    shutValvesQ: '8. Have utility shut valves been located?',
+    excavInspQ: '9. Have excavations been inspected by a trained competent person?',
+    civilWxLbl: '10. Weather Conditions at Excavation Site', civilWxPH: 'Wet, mud, dry, cracks, etc.',
+    // Section 15
+    reviewerInfo: 'The reviewer certifies this JHA was completed accurately before work began.',
+    reviewerLbl: 'Reviewer Name *', reviewerPH: "Reviewer's full name",
+    // Section 16
+    crewSubtitle: 'All crew members (including subcontractors) must sign. Tap canvas to sign.',
+    addCrewBtn: '＋ ADD CREW MEMBER',
+    crewNamePH: 'Printed Name', crewHHPH: 'Hard Hat #', clearSig: 'Clear',
+    // Section 17
+    reviewInfo: '📋 Review your JHA before submitting. It will be emailed to omarr@dwilsonconstruction.com',
+    // Success
+    succTitle: 'JHA Submitted!',
+    succFor: 'Job Hazard Analysis for',
+    succEmailOk: '✅ PDF emailed to omarr@dwilsonconstruction.com',
+    succEmailFail: '⚠️ Use the download button below to save your PDF, then email it manually.',
+    succSmsTitle: '📲 Text Notification',
+    succSmsBody: 'Summary being sent to <strong>(956) 435-2102</strong>. If messaging didn\'t open automatically, tap below.',
+    succSmsBtn: '💬 SEND TEXT NOW',
+    succScreenshot: 'Screenshot this screen for your records.',
+    succDownload: '📄 DOWNLOAD FILLED PDF',
+  },
+  es: {
+    hdrTitle: 'Análisis de Peligros', hdrSub: 'D. Wilson Construction',
+    submitBtn: '📤 ENVIAR AHP', nextBtn: 'SIGUIENTE →', backBtn: '← ATRÁS',
+    overlayMsg: 'ENVIANDO...', overlayBuilding: 'GENERANDO PDF…', overlaySending: 'ENVIANDO AHP…',
+    s1title: 'Información Básica', s2title: 'Alcance del Trabajo', s3title: 'Condiciones Climáticas',
+    s4title: 'Procedimientos de Emergencia', s5title: 'Pasos Involucrados', s6title: 'Peligros Potenciales',
+    s7title: 'Medidas Preventivas', s8title: 'Factores de Riesgo Ergonómico', s9title: 'EPP Requerido',
+    s10title: 'Trabajo Civil', s15title: 'Revisor del AHP', s16title: 'Firmas del Personal', s17title: 'Revisar y Enviar',
+    company: 'Empresa *', fname: 'Capataz / Nombre *', fdate: 'Fecha *', location: 'Ubicación *',
+    companyPH: 'Nombre de la empresa', fnamePH: 'Nombre completo', locationPH: 'Dirección del sitio de trabajo',
+    scopeLbl: 'Describa el alcance del trabajo de hoy *', scopePH: '¿Qué trabajo se realizará hoy?',
+    weatherLbl: 'Clima', tempLbl: 'Temperatura (°F)', tempPH: 'ej. 92°F',
+    windLbl: 'Viento', notesLbl: 'Notas', notesPH: 'Notas adicionales sobre el clima...',
+    wxOther: 'Otro', windVL: 'Muy Leve', windW: 'Ventoso', windVW: 'Muy Ventoso',
+    emergInfo: '⚠️ Complete toda la información de emergencia antes de comenzar el trabajo.',
+    notifyQ: '¿Está al tanto de notificar a D. Wilson en caso de accidente?',
+    injuredQ: '¿Se lesionó hoy?',
+    locationsLbl: 'Ubicaciones Confirmadas',
+    firstAidLbl: 'Ubicación del Botiquín de Primeros Auxilios – Oficina DWCC',
+    stretcherLbl: 'Ubicación de Camilla / Canasta / Rescate en Altura – N/A',
+    msdsLbl: 'Ubicación de M.S.D.S / S.D.S – Oficina DWCC',
+    evacuationLbl: 'Puntos de Evacuación – Estacionamiento',
+    fireExtLbl: 'Extintores – Espacios Renovados / Baños',
+    clinicNameLbl: 'Nombre de la Clínica', clinicLocLbl: 'Ubicación de la Clínica',
+    clinicProtoQ: 'Sé dónde está ubicada la clínica',
+    hospNameLbl: 'Hospital Más Cercano', hospLocLbl: 'Ubicación del Hospital',
+    yes: 'Sí', no: 'No',
+    stepsSubtitle: 'Liste los pasos para prepararse para su trabajo (hasta 5).',
+    stepsEx: 'Ejemplos',
+    stepsExText: '<span style="color:var(--light);font-weight:600">Pintor</span> — Alcance: pintar paredes / Pasos: localizar área de lavado, cubrir áreas cercanas, limpiar superficies al terminar<br><span style="color:var(--light);font-weight:600">Tablaroca</span> — Alcance: enmarcar paredes / Pasos: recoger material, trazar y enmarcar paredes, limpieza general<br><span style="color:var(--light);font-weight:600">HVAC</span> — Alcance: demoler ductos / Pasos: recoger escalera y herramientas, identificar peligros en lo alto, retirar ductos, sacar basura del edificio y limpiar',
+    step: 'Paso',
+    hazSubtitle: 'Marque TODOS los peligros relacionados con el alcance del trabajo de hoy.',
+    otherHazLbl: 'Otros Peligros', otherHazPH: 'Otros peligros...',
+    pmSubtitle: 'Liste las medidas preventivas para cada peligro identificado (hasta 8).',
+    pmPH: 'Medida preventiva',
+    ergoSubtitle: 'Marque todos los factores de riesgo ergonómico identificados.',
+    ppeSubtitle: 'Seleccione todo el EPP requerido para el trabajo de hoy.',
+    otherPPELbl: 'EPP Adicional', otherPPEPH: 'ej. guantes, respirador...',
+    civilInfo: "⚙️ Se requiere Plan de Zanjeo Aprobado por Ingeniero para zanjas >5 pies.",
+    civilQ: "¿El trabajo de hoy incluye trabajo civil / excavación?",
+    civilNA: 'N/A — Omitir', civilYes: 'Sí',
+    soilLbl: '1. Tipo y Profundidad de las Excavaciones',
+    excavDepthLbl: 'Descripción de la Profundidad', excavDepthPH: 'Describa la profundidad y tipo de excavación…',
+    caveInLbl: '2. Medidas de Control de Derrumbe / Engullimiento (Zanjas >5 pies)',
+    terrainLbl: '3. Elevación / Terreno / Preocupaciones Ambientales / Peligros', terrainPH: 'Describa elevación, terreno, peligros ambientales…',
+    vehicleLbl: '4. Peligros con Acceso al Sitio / Vehículos', vehiclePH: 'Tráfico pesado, carga pesada, grúas, almacenamiento de materiales/HAZMAT…',
+    elecGasLbl: '5. Preocupaciones de Electricidad o Gas', elecGasPH: 'ej. Línea Eléctrica/Gas/Fibra Óptica…',
+    utilLocQ: '6. ¿Han sido ubicadas/sondeadas las tuberías existentes?',
+    tx811Q: '7. ¿Se contactó a Texas 811?',
+    shutValvesQ: '8. ¿Han sido localizadas las válvulas de cierre de servicios?',
+    excavInspQ: '9. ¿Ha sido inspeccionada la excavación por una persona competente?',
+    civilWxLbl: '10. Condiciones Climáticas en el Sitio de Excavación', civilWxPH: 'Húmedo, lodo, seco, grietas, etc.',
+    reviewerInfo: 'El revisor certifica que este AHP fue completado con precisión antes de comenzar el trabajo.',
+    reviewerLbl: 'Nombre del Revisor *', reviewerPH: 'Nombre completo del revisor',
+    crewSubtitle: 'Todo el personal (incluyendo subcontratistas) debe firmar. Toque el área para firmar.',
+    addCrewBtn: '＋ AGREGAR MIEMBRO',
+    crewNamePH: 'Nombre Impreso', crewHHPH: 'Casco #', clearSig: 'Borrar',
+    reviewInfo: '📋 Revise su AHP antes de enviar. Será enviado a omarr@dwilsonconstruction.com',
+    succTitle: '¡AHP Enviado!',
+    succFor: 'Análisis de Peligros del Trabajo para',
+    succEmailOk: '✅ PDF enviado a omarr@dwilsonconstruction.com',
+    succEmailFail: '⚠️ Use el botón de descarga para guardar su PDF y envíelo manualmente.',
+    succSmsTitle: '📲 Notificación por Texto',
+    succSmsBody: 'Resumen siendo enviado al <strong>(956) 435-2102</strong>. Si los mensajes no se abrieron automáticamente, toque abajo.',
+    succSmsBtn: '💬 ENVIAR TEXTO AHORA',
+    succScreenshot: 'Tome una captura de pantalla para sus registros.',
+    succDownload: '📄 DESCARGAR PDF',
+  }
+};
+
+// Hazard labels bilingual
+const HAZ_LABELS = {
+  en: {
+    'Access / Egress': 'Access / Egress', 'Crane': 'Crane', 'Fire Hazards': 'Fire Hazards',
+    'Impalement Hazards': 'Impalement Hazards', 'Material Handling': 'Material Handling',
+    'Access to General Public': 'Access to General Public', 'Demolition': 'Demolition',
+    'Floor / Wall Openings': 'Floor / Wall Openings', 'Ladders (Tied Off / Inspected)': 'Ladders (Tied Off / Inspected)',
+    'Overhead Power Lines': 'Overhead Power Lines', 'Barricades / Signage': 'Barricades / Signage',
+    'Electrical Hazards': 'Electrical Hazards', 'Guardrails / Toeboards / Bracing': 'Guardrails / Toeboards / Bracing',
+    'Lifts': 'Lifts', 'Pinch Points': 'Pinch Points', 'Chemical Hazards': 'Chemical Hazards',
+    'Excavation / Trench': 'Excavation / Trench', 'Hearing Protection': 'Hearing Protection',
+    'Lighting': 'Lighting', 'Powder Actuated Tools': 'Powder Actuated Tools',
+    'Confined Spaces': 'Confined Spaces', 'Fall Hazards': 'Fall Hazards', 'Heavy Equipment': 'Heavy Equipment',
+    'Lockout / Tagout': 'Lockout / Tagout', 'Traffic Control': 'Traffic Control',
+    'Inspection Current': 'Inspection Current', 'Proper Tools for the Job': 'Proper Tools for the Job',
+    'Tools in Good Working Condition': 'Tools in Good Working Condition',
+    'Qualification Required': 'Qualification Required', 'Manual Lifting Equipment': 'Manual Lifting Equipment',
+    'Proper Rigging Practices': 'Proper Rigging Practices',
+    'Manual Lifting (Using Your Legs) <50 lbs': 'Manual Lifting (Using Your Legs) <50 lbs',
+    'Hole Covers': 'Hole Covers', 'Overhead Work / Other': 'Overhead Work / Other',
+    'Work Crews Heavy Equipment': 'Work Crews Heavy Equipment', 'Underground Utilities': 'Underground Utilities',
+    'Scaffold (Properly Inspected by Competent Person)': 'Scaffold (Properly Inspected by Competent Person)',
+    'Personal Basket (Inspected and Approved)': 'Personal Basket (Inspected and Approved)',
+    'Aerial Lift / Certification': 'Aerial Lift / Certification', 'Confined Space (Entry)': 'Confined Space (Entry)',
+    'Try Start / Stop Switch': 'Try Start / Stop Switch', 'GFCI': 'GFCI',
+    'Slip / Trip Potential': 'Slip / Trip Potential', 'Body Position / Line of Fire': 'Body Position / Line of Fire',
+    'Crush By / Struck By / Contact With': 'Crush By / Struck By / Contact With',
+    'Adequate Anchorage Points': 'Adequate Anchorage Points', 'Sharp Objects': 'Sharp Objects',
+    'Lift Equipment Properly Inspected by Qualified Person': 'Lift Equipment Properly Inspected by Qualified Person',
+  },
+  es: {
+    'Access / Egress': 'Acceso / Salida', 'Crane': 'Grúa', 'Fire Hazards': 'Peligros de Incendio',
+    'Impalement Hazards': 'Peligros de Empalamiento', 'Material Handling': 'Manejo de Materiales',
+    'Access to General Public': 'Acceso al Público General', 'Demolition': 'Demolición',
+    'Floor / Wall Openings': 'Aberturas en Pisos / Paredes', 'Ladders (Tied Off / Inspected)': 'Escaleras (Aseguradas / Inspeccionadas)',
+    'Overhead Power Lines': 'Líneas Eléctricas Aéreas', 'Barricades / Signage': 'Barricadas / Señalización',
+    'Electrical Hazards': 'Peligros Eléctricos', 'Guardrails / Toeboards / Bracing': 'Barandillas / Rodapiés / Refuerzo',
+    'Lifts': 'Elevadores', 'Pinch Points': 'Puntos de Pellizco', 'Chemical Hazards': 'Peligros Químicos',
+    'Excavation / Trench': 'Excavación / Zanja', 'Hearing Protection': 'Protección Auditiva',
+    'Lighting': 'Iluminación', 'Powder Actuated Tools': 'Herramientas de Pólvora',
+    'Confined Spaces': 'Espacios Confinados', 'Fall Hazards': 'Peligros de Caída', 'Heavy Equipment': 'Equipo Pesado',
+    'Lockout / Tagout': 'Bloqueo / Etiquetado', 'Traffic Control': 'Control de Tráfico',
+    'Inspection Current': 'Inspección al Día', 'Proper Tools for the Job': 'Herramientas Adecuadas para el Trabajo',
+    'Tools in Good Working Condition': 'Herramientas en Buen Estado',
+    'Qualification Required': 'Calificación Requerida', 'Manual Lifting Equipment': 'Equipo de Levantamiento Manual',
+    'Proper Rigging Practices': 'Prácticas de Aparejo Correctas',
+    'Manual Lifting (Using Your Legs) <50 lbs': 'Levantamiento Manual (Usando las Piernas) <50 lbs',
+    'Hole Covers': 'Cubiertas de Hoyos', 'Overhead Work / Other': 'Trabajo en Altura / Otro',
+    'Work Crews Heavy Equipment': 'Cuadrillas con Equipo Pesado', 'Underground Utilities': 'Servicios Subterráneos',
+    'Scaffold (Properly Inspected by Competent Person)': 'Andamio (Inspeccionado por Persona Competente)',
+    'Personal Basket (Inspected and Approved)': 'Canasta Personal (Inspeccionada y Aprobada)',
+    'Aerial Lift / Certification': 'Elevador Aéreo / Certificación', 'Confined Space (Entry)': 'Espacio Confinado (Entrada)',
+    'Try Start / Stop Switch': 'Interruptor de Arranque / Parada', 'GFCI': 'GFCI',
+    'Slip / Trip Potential': 'Riesgo de Resbalón / Tropiezo', 'Body Position / Line of Fire': 'Posición del Cuerpo / Línea de Fuego',
+    'Crush By / Struck By / Contact With': 'Aplastamiento / Golpe / Contacto Con',
+    'Adequate Anchorage Points': 'Puntos de Anclaje Adecuados', 'Sharp Objects': 'Objetos Punzantes',
+    'Lift Equipment Properly Inspected by Qualified Person': 'Equipo de Elevación Inspeccionado por Persona Calificada',
+  }
+};
+
+// Ergo labels bilingual
+const ERGO_LABELS = {
+  en: { 'Awkward Positioning':'Awkward Positioning','Reach/Clear Access':'Reach/Clear Access','Excessive Force':'Excessive Force','Repetitive Movements':'Repetitive Movements','Lifting':'Lifting','Sharp Work Surfaces':'Sharp Work Surfaces','Overhead Work':'Overhead Work','Vibrating Tools/Equipment':'Vibrating Tools/Equipment' },
+  es: { 'Awkward Positioning':'Posicionamiento Incómodo','Reach/Clear Access':'Alcance / Acceso Libre','Excessive Force':'Fuerza Excesiva','Repetitive Movements':'Movimientos Repetitivos','Lifting':'Levantamiento','Sharp Work Surfaces':'Superficies Cortantes','Overhead Work':'Trabajo en Altura','Vibrating Tools/Equipment':'Herramientas / Equipos Vibratorios' }
+};
+
+// PPE labels bilingual
+const PPE_LABELS = {
+  en: { 'Hard Hat':'Hard Hat','Safety Glasses':'Safety Glasses','Safety Vest':'Safety Vest','Work Boots':'Work Boots' },
+  es: { 'Hard Hat':'Casco de Seguridad','Safety Glasses':'Lentes de Seguridad','Safety Vest':'Chaleco de Seguridad','Work Boots':'Botas de Trabajo' }
+};
+
+// Cave-in controls bilingual
+const CAVE_LABELS = {
+  en: { 'Sloping':'Sloping','Benching':'Benching','Trenching':'Trenching','Shoring':'Shoring',"Shield / Box":'Shield / Box',"Ladder in Trench >5 ft and Every 25'":'Ladder in Trench >5 ft and Every 25\'','Sump Pump':'Sump Pump','LOTO':'LOTO' },
+  es: { 'Sloping':'Talud','Benching':'Escalonado','Trenching':'Zanjado','Shoring':'Apuntalamiento',"Shield / Box":'Escudo / Caja',"Ladder in Trench >5 ft and Every 25'":'Escalera en Zanja >5 pies y Cada 25\'','Sump Pump':'Bomba de Achique','LOTO':'LOTO' }
+};
+
+// ──────────────────────────────────────────
+// Apply language to all form elements
+// ──────────────────────────────────────────
+function applyLang(lang) {
+  LANG = lang;
+  const t = T[lang];
+
+  // Header
+  document.querySelector('.hdr-title').innerHTML = `${t.hdrTitle}<span>${t.hdrSub}</span>`;
+
+  // Section titles
+  const secMap = {1:'s1',2:'s2',3:'s3',4:'s4',5:'s5',6:'s6',7:'s7',8:'s8',9:'s9',10:'s10',15:'s15',16:'s16',17:'s17'};
+  const titleMap = {1:t.s1title,2:t.s2title,3:t.s3title,4:t.s4title,5:t.s5title,6:t.s6title,
+                    7:t.s7title,8:t.s8title,9:t.s9title,10:t.s10title,15:t.s15title,16:t.s16title,17:t.s17title};
+  Object.entries(titleMap).forEach(([sec, title]) => {
+    const el = document.querySelector(`#s${sec} .sec-title`);
+    if (el) { const icon = el.querySelector('.sec-icon'); el.innerHTML = ''; if(icon) el.appendChild(icon); el.appendChild(document.createTextNode(title)); }
+  });
+  // Civil work sub-sections
+  [11,12,13,14].forEach((n,i) => {
+    const el = document.querySelector(`#s${n} .sec-title`);
+    if (el) { const icon = el.querySelector('.sec-icon'); el.innerHTML = ''; if(icon) el.appendChild(icon); el.appendChild(document.createTextNode(t.s10title + ` (${i+2}/5)`)); }
+  });
+
+  // Section 1 fields
+  setLbl('company', t.company); setLbl('fname', t.fname); setLbl('fdate', t.fdate); setLbl('location', t.location);
+  setPH('company', t.companyPH); setPH('fname', t.fnamePH); setPH('location', t.locationPH);
+
+  // Section 2
+  const scopeLabel = document.querySelector('#s2 .lbl');
+  if (scopeLabel) scopeLabel.textContent = t.scopeLbl;
+  setPH('scope', t.scopePH);
+
+  // Section 3
+  document.querySelectorAll('#s3 .slbl').forEach((el,i) => { el.textContent = [t.weatherLbl, t.windLbl, t.notesLbl][i] || el.textContent; });
+  setLbl3('temp', t.tempLbl); setPH('temp', t.tempPH);
+  setPH('wxNotes', t.notesPH);
+  document.querySelector('#s3 .lbl') && (document.querySelectorAll('#s3 .lbl')[0].textContent = t.tempLbl);
+  document.querySelectorAll('#s3 .lbl').forEach((el,i) => { if(i===1) el.textContent = t.notesLbl; });
+  // Weather chips
+  const wxMap = {'Clear':lang==='es'?'Despejado':'Clear','Sunny':lang==='es'?'Soleado':'Sunny','Rain':lang==='es'?'Lluvia':'Rain','Overcast':lang==='es'?'Nublado':'Overcast','Drizzle':lang==='es'?'Llovizna':'Drizzle','Foggy':lang==='es'?'Neblina':'Foggy','Other':t.wxOther};
+  const wxEmoji = {'Clear':'☀️','Sunny':'🌞','Rain':'🌧️','Overcast':'☁️','Drizzle':'🌦️','Foggy':'🌫️','Other':''};
+  document.querySelectorAll('#s3 .chip[data-g="wx"]').forEach(el => {
+    const v = el.dataset.v;
+    el.textContent = (wxEmoji[v]||'') + ' ' + (wxMap[v]||v);
+  });
+  // Wind buttons
+  const windMap = {'Very Light':t.windVL,'Windy':t.windW,'Very Windy':t.windVW};
+  document.querySelectorAll('.rbtn[data-g="wind"]').forEach(el => { el.textContent = windMap[el.dataset.v]||el.dataset.v; });
+
+  // Section 4
+  const s4info = document.querySelector('#s4 .info');
+  if (s4info) s4info.textContent = t.emergInfo;
+  document.querySelectorAll('#s4 .slbl').forEach((el,i) => {
+    const map = [t.notifyQ, t.injuredQ, t.locationsLbl];
+    if (map[i]) el.textContent = map[i];
+  });
+  // Yes/No buttons
+  document.querySelectorAll('.rbtn[data-v="Yes"]').forEach(el => el.textContent = t.yes);
+  document.querySelectorAll('.rbtn[data-v="No"]').forEach(el => el.textContent = t.no);
+  // Emergency checklist labels
+  const emergMap = {firstAid:t.firstAidLbl,stretcher:t.stretcherLbl,msds:t.msdsLbl,evacuation:t.evacuationLbl,fireExt:t.fireExtLbl};
+  Object.entries(emergMap).forEach(([k,v]) => {
+    const el = document.querySelector(`.ckitem[data-k="${k}"] .cklabel`);
+    if (el) el.textContent = v;
+  });
+  setLbl4('clinicName', t.clinicNameLbl); setLbl4('clinicLoc', t.clinicLocLbl); setLbl4('hospName', t.hospNameLbl); setLbl4('hospLoc', t.hospLocLbl);
+  const s4slbls = document.querySelectorAll('#s4 .slbl');
+  if (s4slbls[3]) s4slbls[3].textContent = t.clinicProtoQ;
+
+  // Section 5
+  const s5p = document.querySelector('#s5 p');
+  if (s5p) s5p.textContent = t.stepsSubtitle;
+  const s5exTitle = document.querySelector('#s5 .info p:first-child');
+  const s5box = document.querySelector('#s5 div[style*="amber"]') || document.querySelector('#s5 div[style*="FFB800"]');
+  if (s5box) {
+    const ps = s5box.querySelectorAll('p');
+    if (ps[0]) ps[0].textContent = t.stepsEx;
+    if (ps[1]) ps[1].innerHTML = t.stepsExText.split('<br>')[0];
+    if (ps[2]) ps[2].innerHTML = t.stepsExText.split('<br>')[1];
+    if (ps[3]) ps[3].innerHTML = t.stepsExText.split('<br>')[2];
+  }
+  document.querySelectorAll('#s5 .nrow input').forEach((el,i) => el.placeholder = `${t.step} ${i+1}…`);
+
+  // Section 6 — hazard labels
+  const s6p = document.querySelector('#s6 p');
+  if (s6p) s6p.textContent = t.hazSubtitle;
+  document.querySelectorAll('#s6 .ckitem[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    const lbl = el.querySelector('.cklabel');
+    if (lbl && HAZ_LABELS[lang][k]) lbl.textContent = HAZ_LABELS[lang][k];
+  });
+  const s6otherLbl = document.querySelector('#s6 .fld .lbl');
+  if (s6otherLbl) s6otherLbl.textContent = t.otherHazLbl;
+  setPH('otherHaz', t.otherHazPH);
+
+  // Section 7
+  const s7p = document.querySelector('#s7 p');
+  if (s7p) s7p.textContent = t.pmSubtitle;
+  document.querySelectorAll('#s7 .nrow input').forEach((el,i) => el.placeholder = `${t.pmPH} ${i+1}…`);
+
+  // Section 8 — ergo labels
+  const s8p = document.querySelector('#s8 p');
+  if (s8p) s8p.textContent = t.ergoSubtitle;
+  document.querySelectorAll('#s8 .ckitem[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    const lbl = el.querySelector('.cklabel');
+    if (lbl && ERGO_LABELS[lang][k]) lbl.textContent = ERGO_LABELS[lang][k];
+  });
+
+  // Section 9 — PPE labels
+  const s9p = document.querySelector('#s9 p');
+  if (s9p) s9p.textContent = t.ppeSubtitle;
+  document.querySelectorAll('#s9 .ckitem[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    const lbl = el.querySelector('.cklabel');
+    if (lbl && PPE_LABELS[lang][k]) lbl.textContent = PPE_LABELS[lang][k];
+  });
+  const s9otherLbl = document.querySelector('#s9 .fld .lbl');
+  if (s9otherLbl) s9otherLbl.textContent = t.otherPPELbl;
+  setPH('otherPPE', t.otherPPEPH);
+
+  // Section 10 — civil
+  const s10info = document.querySelector('#s10 .info');
+  if (s10info) s10info.textContent = t.civilInfo;
+  const s10slbl = document.querySelector('#s10 .slbl');
+  if (s10slbl) s10slbl.textContent = t.civilQ;
+  const civilNABtn = document.querySelector('.rbtn[data-g="civilApplies"][data-v="N/A"]');
+  const civilYesBtn = document.querySelector('.rbtn[data-g="civilApplies"][data-v="Yes"]');
+  if (civilNABtn) civilNABtn.textContent = t.civilNA;
+  if (civilYesBtn) civilYesBtn.textContent = t.civilYes;
+  const soilSlbl = document.querySelector('#s10 #civilFields .slbl');
+  if (soilSlbl) soilSlbl.textContent = t.soilLbl;
+  const excavLbl = document.querySelector('#s10 #civilFields .fld .lbl');
+  if (excavLbl) excavLbl.textContent = t.excavDepthLbl;
+  setPH('excavDepth', t.excavDepthPH);
+  // Cave-in controls
+  const s11slbl = document.querySelector('#s11 .slbl');
+  if (s11slbl) s11slbl.textContent = t.caveInLbl;
+  document.querySelectorAll('#s11 .ckitem[data-k]').forEach(el => {
+    const k = el.dataset.k; const lbl = el.querySelector('.cklabel');
+    if (lbl && CAVE_LABELS[lang][k]) lbl.textContent = CAVE_LABELS[lang][k];
+  });
+  // Civil text fields s12
+  document.querySelectorAll('#s12 .fld .lbl').forEach((el,i) => {
+    if (i===0) el.textContent = t.terrainLbl;
+    if (i===1) el.textContent = t.vehicleLbl;
+  });
+  setPH('terrain', t.terrainPH); setPH('vehicleAccess', t.vehiclePH);
+  // s13
+  const s13lbls = document.querySelectorAll('#s13 .fld .lbl');
+  if (s13lbls[0]) s13lbls[0].textContent = t.elecGasLbl;
+  setPH('elecGas', t.elecGasPH);
+  document.querySelectorAll('#s13 .slbl').forEach((el,i) => {
+    if(i===0) el.textContent = t.utilLocQ;
+    if(i===1) el.textContent = t.tx811Q;
+  });
+  // s14
+  document.querySelectorAll('#s14 .slbl').forEach((el,i) => {
+    if(i===0) el.textContent = t.shutValvesQ;
+    if(i===1) el.textContent = t.excavInspQ;
+  });
+  const s14lbl = document.querySelector('#s14 .fld .lbl');
+  if (s14lbl) s14lbl.textContent = t.civilWxLbl;
+  setPH('civilWx', t.civilWxPH);
+
+  // Section 15
+  const s15info = document.querySelector('#s15 .info');
+  if (s15info) s15info.textContent = t.reviewerInfo;
+  const s15lbl = document.querySelector('#s15 .fld .lbl');
+  if (s15lbl) s15lbl.textContent = t.reviewerLbl;
+  setPH('reviewer', t.reviewerPH);
+
+  // Section 16
+  const s16p = document.querySelector('#s16 p');
+  if (s16p) s16p.textContent = t.crewSubtitle;
+  const addCrewBtnEl = document.querySelector('#s16 .add-crew');
+  if (addCrewBtnEl) addCrewBtnEl.textContent = t.addCrewBtn;
+  // Update existing crew cards
+  document.querySelectorAll('.crew-name-input').forEach(el => el.placeholder = t.crewNamePH);
+  document.querySelectorAll('.crew-hh-input').forEach(el => el.placeholder = t.crewHHPH);
+  document.querySelectorAll('.sig-clr').forEach(el => el.textContent = t.clearSig);
+
+  // Section 17
+  const s17info = document.querySelector('#s17 .info');
+  if (s17info) s17info.textContent = t.reviewInfo;
+
+  // Nav buttons
+  document.getElementById('btnNext').textContent = cur === TOTAL ? t.submitBtn : t.nextBtn;
+  document.getElementById('btnBack').textContent = t.backBtn;
+
+  // Success screen
+  const succH2 = document.querySelector('#successSc h2');
+  if (succH2) succH2.textContent = t.succTitle;
+  const succSmsBtnEl = document.getElementById('succSmsBtn');
+  if (succSmsBtnEl) succSmsBtnEl.textContent = t.succSmsBtn;
+  const succDlBtn = document.getElementById('succPdfBtn');
+  if (succDlBtn) succDlBtn.textContent = t.succDownload;
+  const succScreen = document.getElementById('succStatus');
+  // screenshot text
+  const succScreenshotEl = document.querySelector('#successSc p:last-child');
+  if (succScreenshotEl) succScreenshotEl.textContent = t.succScreenshot;
+}
+
+// Helper to set label text by input id
+function setLbl(id, text) {
+  const input = document.getElementById(id);
+  if (input) { const lbl = input.closest('.fld')?.querySelector('.lbl'); if(lbl) lbl.textContent = text; }
+}
+function setLbl3(id, text) { setLbl(id, text); } // alias
+function setLbl4(id, text) { setLbl(id, text); }
+function setPH(id, text) { const el = document.getElementById(id); if (el) el.placeholder = text; }
+
+// ──────────────────────────────────────────
+// Language selection entry point
+// ──────────────────────────────────────────
+function setLang(lang) {
+  LANG = lang;
+  applyLang(lang);
+
+  // Show header and nav, hide language screen, go to section 1
+  document.getElementById('mainHdr').style.display = 'block';
+  document.getElementById('navBar').style.display = 'flex';
+  document.getElementById('s0').classList.remove('on');
+  cur = 1;
+  render();
+}
+
 </script>
 </body>
 </html>

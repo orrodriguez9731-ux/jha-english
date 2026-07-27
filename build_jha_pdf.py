@@ -23,6 +23,106 @@ def build(data_path, out_path):
     with open(data_path) as f:
         d = json.load(f)
 
+    lang = d.get('lang', 'en')
+
+    # ── PDF label strings (bilingual) ─────────────────────────
+    if lang == 'es':
+        L = {
+            'title1': 'Análisis de Peligros', 'title2': 'del Trabajo (AHP)',
+            'reviewer': 'Revisor:', 'company': 'Empresa:', 'name': 'Nombre:',
+            'date': 'Fecha:', 'weather': 'Clima', 'location': 'Ubicación:',
+            'scope': 'Alcance:', 'temp': 'Temperatura', 'wind': 'Viento', 'notes': 'Notas:',
+            'clear':'Despejado','sunny':'Soleado','rain':'Lluvia','overcast':'Nublado',
+            'drizzle':'Llovizna','foggy':'Neblina','other':'Otro',
+            'vlight':'Muy Leve','windy':'Ventoso','vwindy':'Muy Ventoso',
+            'emerg': 'Procedimientos de Emergencia',
+            'notifyQ': '¿Está al tanto de notificar a D. Wilson en caso de accidente?',
+            'injuredQ': '¿Se lesionó hoy?',
+            'firstAid':'Ubicación del Botiquín – Oficina DWCC',
+            'stretcher':'Ubicación de Camilla / Canasta / Rescate en Altura – N/A',
+            'msds':'Ubicación de M.S.D.S / S.D.S – Oficina DWCC',
+            'evacuation':'Puntos de Evacuación – Estacionamiento',
+            'fireExt':'Extintores – Espacios Renovados / Baños',
+            'clinicName':'Nombre de la Clínica:', 'clinicLoc':'Ubicación de la Clínica:',
+            'clinicProto':'Sé dónde está la clínica:', 'yes':'Sí', 'no':'No',
+            'hospName':'Hospital Más Cercano:', 'hospLoc':'Ubicación del Hospital:',
+            'steps': 'Pasos Involucrados:',
+            'hazards': 'Lista de Peligros Potenciales',
+            'prevMeasures': 'Medidas Preventivas para Cada Peligro',
+            'ergo': 'Factores de Riesgo Ergonómico Identificados',
+            'ppe': 'EPP Requerido',
+            'civilWork': 'Completar para Trabajo Civil',
+            'civilNote': "(Nota: Se requiere Plan de Zanjeo Aprobado por Ingeniero para Zanjas >5')",
+            'soil1': '1. Describa el tipo y profundidad de excavaciones:',
+            'typeA':'Tipo A Suelo/Roca','typeB':'Tipo B Suelo/Roca','typeC':'Tipo C Suelo/Roca',
+            'cave2': '2. Medidas de control de derrumbe si la excavación será mayor de 5 pies:',
+            'terrain3': '3. Describa elevación/terreno/preocupaciones ambientales/peligros:',
+            'vehicle4': '4. Describa peligros con acceso al sitio/vehículos (Tráfico Pesado, HAZMAT):',
+            'elecgas5': '5. Describa el tipo de preocupaciones eléctricas o de gas:',
+            'util6': '6. ¿Han sido ubicadas/sondeadas las tuberías existentes?',
+            'tx8117': '7. ¿Se ha contactado la línea directa Texas 811:',
+            'valves8': '8. ¿Han sido localizadas las válvulas de cierre de servicios?',
+            'inspect9': '9. ¿Ha sido inspeccionada la excavación por una persona competente calificada?',
+            'wx10': '10. Condiciones climáticas? (Húmedo, Lodo, Peligros de Excavación, Seco, Grietas):',
+            'crew': 'Firma del Personal (Incluyendo Subcontratistas)',
+            'printed': 'Nombre Impreso:', 'hh': 'Número de Casco:', 'signature': 'Firma:',
+            'naText': 'N/A — Trabajo civil no aplica para el alcance de hoy.',
+            'awkward':'Posicionamiento Incómodo','reach':'Alcance / Acceso Libre',
+            'force':'Fuerza Excesiva','repetitive':'Movimientos Repetitivos',
+            'lifting':'Levantamiento','sharpsurf':'Superficies Cortantes',
+            'overhead':'Trabajo en Altura','vibrating':'Herramientas Vibratorias',
+            'hardhat':'Casco de Seguridad','glasses':'Lentes de Seguridad',
+            'vest':'Chaleco de Seguridad','boots':'Botas de Trabajo',
+        }
+    else:
+        L = {
+            'title1': 'Job Hazard', 'title2': 'Analysis (JHA)',
+            'reviewer': 'Reviewer:', 'company': 'Company:', 'name': 'Name:',
+            'date': 'Date:', 'weather': 'Weather', 'location': 'Location:',
+            'scope': 'Scope:', 'temp': 'Temperature', 'wind': 'Wind', 'notes': 'Notes:',
+            'clear':'Clear','sunny':'Sunny','rain':'Rain','overcast':'Overcast',
+            'drizzle':'Drizzle','foggy':'Foggy','other':'Other',
+            'vlight':'Very Light','windy':'Windy','vwindy':'Very Windy',
+            'emerg': 'Emergency Procedures',
+            'notifyQ': 'Are you aware to notify D. Wilson in case of accident?',
+            'injuredQ': 'Were you injured today?',
+            'firstAid':'First Aid Kit Location',
+            'stretcher':'Stretcher Location/ Basket/ High-Rise Rescue',
+            'msds':'M.S.D.S Location/ S.D.S Location',
+            'evacuation':'Evacuation Points',
+            'fireExt':'Fire Extinguisher Location(s)',
+            'clinicName':'Clinic Name:', 'clinicLoc':'Clinic Location:',
+            'clinicProto':'Clinic Protocols:', 'yes':'Yes', 'no':'No',
+            'hospName':'Nearest Hospital Name:', 'hospLoc':'Nearest Hospital Location:',
+            'steps': 'Steps Involved:',
+            'hazards': 'Potential Hazards Check List',
+            'prevMeasures': 'Preventive Measures for Each Hazard',
+            'ergo': 'Ergonomic Risk Factors Identified',
+            'ppe': 'PPE Required',
+            'civilWork': 'Complete for Civil Work',
+            'civilNote': "(Please Note: Engineer Approved Trenching Plan Required for Trenches >5')",
+            'soil1': '1. Describe type and depth of excavations:',
+            'typeA':'Type A Soil/Rock','typeB':'Type B Soil/Rock','typeC':'Type C Soil/Rock',
+            'cave2': '2. Cave-in/Engulfment control measures to be used if excavation will be greater than 5 feet:',
+            'terrain3': '3. Describe elevation/site terrain/environmental concerns/hazards:',
+            'vehicle4': '4. Describe hazards with site/vehicle access (High Traffic, Heavy Haul, Boom Cranes, HAZMAT):',
+            'elecgas5': '5. Describe type of electrical or gas concerns (e.g. Electrical/Gas/Fiber Optic):',
+            'util6': '6. Have existing utilities been potholed/located?',
+            'tx8117': '7. Has Texas 811 hot-line been contacted:',
+            'valves8': '8. Have Utility shut valves been located?',
+            'inspect9': '9. Have excavations been inspected by a trained competent person?',
+            'wx10': '10. Weather Conditions? (Wet, Mud, Excavation Hazards, Dry, Cracks):',
+            'crew': 'Crew Member Signature (Including Subcontractors)',
+            'printed': 'Printed:', 'hh': 'Hard Hat Number:', 'signature': 'Signature:',
+            'naText': "N/A — Civil work not applicable for today's scope.",
+            'awkward':'Awkward Positioning','reach':'Reach/Clear Access',
+            'force':'Excessive Force','repetitive':'Repetitive Movements',
+            'lifting':'Lifting','sharpsurf':'Sharp Work Surfaces',
+            'overhead':'Overhead Work','vibrating':'Vibrating Tools/Equipment',
+            'hardhat':'Hard Hat','glasses':'Safety Glasses',
+            'vest':'Safety Vest','boots':'Work Boots',
+        }
+
     c = rl_canvas.Canvas(out_path, pagesize=letter)
 
     def txt(x, y, s, sz=8, bold=False, col=BLACK, align='left'):
@@ -65,10 +165,10 @@ def build(data_path, out_path):
     TOP = 700
     BOT = 60
 
-    txt(W/2, 738, 'Job Hazard', sz=18, bold=True, align='center')
-    txt(W/2, 718, 'Analysis (JHA)', sz=18, bold=True, align='center')
+    txt(W/2, 738, L['title1'], sz=18, bold=True, align='center')
+    txt(W/2, 718, L['title2'], sz=18, bold=True, align='center')
 
-    txt(380, 704, 'Reviewer:', sz=9, bold=True)
+    txt(380, 704, L['reviewer'], sz=9, bold=True)
     txt(424, 704, val('reviewer'), sz=9)
     hline(421, 702, MR)
 
@@ -77,23 +177,23 @@ def build(data_path, out_path):
 
     # Company
     hline(ML, y, MR, lw=1)
-    txt(ML+3, y-10, 'Company:', sz=8, bold=True)
+    txt(ML+3, y-10, L['company'], sz=8, bold=True)
     txt(ML+46, y-10, val('company'), sz=8)
     hline(ML, y-14, MR)
 
     # Name
-    txt(ML+3, y-25, 'Name:', sz=8, bold=True)
+    txt(ML+3, y-25, L['name'], sz=8, bold=True)
     txt(ML+30, y-25, val('name'), sz=8)
     hline(ML, y-28, MR)
 
     SPLIT = ML + PW*0.49
 
     # Date / Weather row 1
-    txt(ML+3, y-39, 'Date:', sz=8, bold=True)
+    txt(ML+3, y-39, L['date'], sz=8, bold=True)
     txt(ML+28, y-39, val('date'), sz=8)
-    txt(SPLIT+4, y-39, 'Weather', sz=8, bold=True)
+    txt(SPLIT+4, y-39, L['weather'], sz=8, bold=True)
     wx = val('weather')
-    wx1 = [('Clear', wx=='Clear'), ('Rain', wx=='Rain'), ('Overcast', wx=='Overcast')]
+    wx1 = [(L['clear'], wx=='Clear'), (L['rain'], wx=='Rain'), (L['overcast'], wx=='Overcast')]
     cx = SPLIT + 46
     for lbl, chk in wx1:
         cb(cx, y-42, checked=chk); txt(cx+9, y-39, lbl, sz=7); cx += 46
@@ -101,9 +201,9 @@ def build(data_path, out_path):
     hline(ML, y-43, MR)
 
     # Location / Weather row 2
-    txt(ML+3, y-54, 'Location:', sz=8, bold=True)
+    txt(ML+3, y-54, L['location'], sz=8, bold=True)
     txt(ML+42, y-54, val('location'), sz=8)
-    wx2 = [('Sunny', wx=='Sunny'), ('Drizzle', wx=='Drizzle'), ('Foggy', wx=='Foggy')]
+    wx2 = [(L['sunny'], wx=='Sunny'), (L['drizzle'], wx=='Drizzle'), (L['foggy'], wx=='Foggy')]
     cx = SPLIT + 46
     for lbl, chk in wx2:
         cb(cx, y-57, checked=chk); txt(cx+9, y-54, lbl, sz=7); cx += 46
@@ -111,11 +211,11 @@ def build(data_path, out_path):
 
     # Weather Other
     cx = SPLIT + 46
-    cb(cx, y-72, checked=(wx=='Other')); txt(cx+9, y-69, 'Other', sz=7)
+    cb(cx, y-72, checked=(wx=='Other')); txt(cx+9, y-69, L['other'], sz=7)
     hline(ML, y-74, MR)
 
     # Scope / Temperature / Wind / Notes
-    txt(ML+3, y-85, 'Scope:', sz=8, bold=True)
+    txt(ML+3, y-85, L['scope'], sz=8, bold=True)
     scope = val('scope')
     words = scope.split(); lines = []; line = ''
     for w in words:
@@ -128,17 +228,17 @@ def build(data_path, out_path):
     for ln in lines[:4]:
         txt(ML+3, sy, ln, sz=8); sy -= 10
 
-    txt(SPLIT+4, y-85, 'Temperature', sz=8, bold=True)
+    txt(SPLIT+4, y-85, L['temp'], sz=8, bold=True)
     txt(SPLIT+60, y-85, val('temp'), sz=8)
 
     wind = val('wind')
-    txt(SPLIT+4, y-100, 'Wind', sz=8, bold=True)
-    wind_opts = [('Very Light', wind=='Very Light'), ('Windy', wind=='Windy'), ('Very Windy', wind=='Very Windy')]
+    txt(SPLIT+4, y-100, L['wind'], sz=8, bold=True)
+    wind_opts = [(L['vlight'], wind=='Very Light'), (L['windy'], wind=='Windy'), (L['vwindy'], wind=='Very Windy')]
     cx = SPLIT+34
     for lbl, chk in wind_opts:
         cb(cx, y-103, checked=chk); txt(cx+9, y-100, lbl, sz=7); cx += 50
 
-    txt(SPLIT+4, y-115, 'Notes:', sz=8, bold=True)
+    txt(SPLIT+4, y-115, L['notes'], sz=8, bold=True)
     txt(SPLIT+34, y-115, val('wxNotes'), sz=8)
 
     hline(ML, y-120, MR, lw=1)
@@ -146,28 +246,28 @@ def build(data_path, out_path):
     y -= 120
 
     # Emergency Procedures
-    txt(ML+3, y-11, 'Emergency Procedures', sz=9, bold=True)
+    txt(ML+3, y-11, L['emerg'], sz=9, bold=True)
     hline(ML, y-14, MR)
 
-    txt(ML+3, y-24, 'Are you aware to notify D. Wilson in case of accident?', sz=8)
+    txt(ML+3, y-24, L['notifyQ'], sz=8)
     notw = val('notifyW')
-    cb(ML+232, y-27, checked=(notw=='Yes')); txt(ML+241, y-24, 'Yes', sz=8)
-    cb(ML+261, y-27, checked=(notw=='No'));  txt(ML+270, y-24, 'No', sz=8)
+    cb(ML+232, y-27, checked=(notw=='Yes')); txt(ML+241, y-24, L['yes'], sz=8)
+    cb(ML+261, y-27, checked=(notw=='No'));  txt(ML+270, y-24, L['no'], sz=8)
 
-    txt(ML+3, y-36, 'Were you injured today?', sz=8)
+    txt(ML+3, y-36, L['injuredQ'], sz=8)
     inj = val('injured')
-    cb(ML+103, y-39, checked=(inj=='Yes')); txt(ML+112, y-36, 'Yes', sz=8)
-    cb(ML+130, y-39, checked=(inj=='No'));  txt(ML+139, y-36, 'No', sz=8)
+    cb(ML+103, y-39, checked=(inj=='Yes')); txt(ML+112, y-36, L['yes'], sz=8)
+    cb(ML+130, y-39, checked=(inj=='No'));  txt(ML+139, y-36, L['no'], sz=8)
     hline(ML, y-42, MR)
     y -= 42
 
     emerg = d.get('emergChecks', [])
     LEFT_EMERG = [
-        ('firstAid',   'First Aid Kit Location'),
-        ('stretcher',  'Stretcher Location/ Basket/ High-Rise Rescue'),
-        ('msds',       'M.S.D.S Location/ S.D.S Location'),
-        ('evacuation', 'Evacuation Points'),
-        ('fireExt',    'Fire Extinguisher Location(s)'),
+        ('firstAid',   L['firstAid']),
+        ('stretcher',  L['stretcher']),
+        ('msds',       L['msds']),
+        ('evacuation', L['evacuation']),
+        ('fireExt',    L['fireExt']),
     ]
     ey = y
     for key, lbl in LEFT_EMERG:
@@ -176,19 +276,19 @@ def build(data_path, out_path):
         ey -= 13
 
     RCOL = SPLIT + 4
-    txt(RCOL,     y-9,  'Clinic Name:',              sz=7.5, bold=True)
+    txt(RCOL,     y-9,  L['clinicName'], sz=7.5, bold=True)
     txt(RCOL+52,  y-9,  val('clinicName'),            sz=7.5)
-    txt(RCOL,     y-22, 'Clinic Location:',           sz=7.5, bold=True)
+    txt(RCOL,     y-22, L['clinicLoc'], sz=7.5, bold=True)
     txt(RCOL+60,  y-22, val('clinicLoc'),             sz=7.5)
 
     proto = val('clinicProto')
-    txt(RCOL,     y-35, 'Clinic Protocols:',          sz=7.5, bold=True)
-    cb(RCOL+66,   y-38, checked=(proto=='Yes')); txt(RCOL+75,  y-35, 'Yes', sz=7.5)
-    cb(RCOL+93,   y-38, checked=(proto=='No'));  txt(RCOL+102, y-35, 'No',  sz=7.5)
+    txt(RCOL,     y-35, L['clinicProto'], sz=7.5, bold=True)
+    cb(RCOL+66,   y-38, checked=(proto=='Yes')); txt(RCOL+75,  y-35, L['yes'], sz=7.5)
+    cb(RCOL+93,   y-38, checked=(proto=='No'));  txt(RCOL+102, y-35, L['no'],  sz=7.5)
 
-    txt(RCOL,     y-48, 'Nearest Hospital Name:',     sz=7.5, bold=True)
+    txt(RCOL,     y-48, L['hospName'], sz=7.5, bold=True)
     txt(RCOL+92,  y-48, val('hospName'),              sz=7.5)
-    txt(RCOL,     y-61, 'Nearest Hospital Location:', sz=7.5, bold=True)
+    txt(RCOL,     y-61, L['hospLoc'], sz=7.5, bold=True)
     txt(RCOL+102, y-61, val('hospLoc'),               sz=7.5)
 
     vline(SPLIT, ey, y)
@@ -196,7 +296,7 @@ def build(data_path, out_path):
     y = ey
 
     # Steps Involved
-    txt(ML+3, y-11, 'Steps Involved:', sz=9, bold=True)
+    txt(ML+3, y-11, L['steps'], sz=9, bold=True)
     hline(ML, y-14, MR)
     steps = d.get('steps', [])
     for i in range(5):
@@ -207,7 +307,7 @@ def build(data_path, out_path):
     y = y-14-(5*13)
 
     # Potential Hazards header
-    txt(W/2, y-10, 'Potential Hazards Check List', sz=9, bold=True, align='center')
+    txt(W/2, y-10, L['hazards'], sz=9, bold=True, align='center')
     hline(ML, y-13, MR)
     y -= 13
 
@@ -301,7 +401,7 @@ def build(data_path, out_path):
         y2 -= rh
 
     # Preventive Measures
-    txt(W/2, y2-10, 'Preventive Measures for Each Hazard', sz=9, bold=True, align='center')
+    txt(W/2, y2-10, L['prevMeasures'], sz=9, bold=True, align='center')
     hline(ML, y2-13, MR)
     pm = d.get('preventive', [])
     PMID = ML + PW/2
@@ -319,16 +419,16 @@ def build(data_path, out_path):
     EMID = ML + PW/2
     rect(ML,   y2-12, EMID-ML,  12, fill=LGRAY)
     rect(EMID, y2-12, MR-EMID,  12, fill=LGRAY)
-    txt(ML+(EMID-ML)/2, y2-9,       'Ergonomic Risk Factors Identified', sz=7.5, bold=True, align='center')
-    txt(EMID+(MR-EMID)/2, y2-9,     'PPE Required',                       sz=7.5, bold=True, align='center')
+    txt(ML+(EMID-ML)/2, y2-9, L['ergo'], sz=7.5, bold=True, align='center')
+    txt(EMID+(MR-EMID)/2, y2-9, L['ppe'], sz=7.5, bold=True, align='center')
     hline(ML, y2-12, MR)
 
     ergo = d.get('ergos', [])
     ppe  = d.get('ppe',  [])
     ECMID = ML + (EMID-ML)/2
-    ERG_L = ['Awkward Positioning','Excessive Force','Lifting','Overhead Work']
-    ERG_R = ['Reach/Clear Access','Repetitive Movements','Sharp Work Surfaces','Vibrating Tools/Equipment']
-    PPE_I = ['Hard Hat','Safety Glasses','Safety Vest','Work Boots']
+    ERG_L = [L['awkward'],L['force'],L['lifting'],L['overhead']]
+    ERG_R = [L['reach'],L['repetitive'],L['sharpsurf'],L['vibrating']]
+    PPE_I = [L['hardhat'],L['glasses'],L['vest'],L['boots']]
     RH_E  = 11
     for i in range(4):
         ry = y2-12-(i*RH_E)
@@ -349,26 +449,26 @@ def build(data_path, out_path):
 
     # Civil Work
     civil_na = not val('soilType') and not val('excavDepth')
-    txt(ML+3, y2-10, 'Complete for Civil Work', sz=8, bold=True)
-    txt(ML+126, y2-10, "(Please Note: Engineer Approved Trenching Plan Required for Trenches >5')", sz=6.5)
+    txt(ML+3, y2-10, L['civilWork'], sz=8, bold=True)
+    txt(ML+126, y2-10, L['civilNote'], sz=6.5)
     hline(ML, y2-13, MR)
     y2 -= 13
 
     if civil_na:
-        txt(ML+3, y2-10, "N/A — Civil work not applicable for today's scope.", sz=8, col=DGRAY)
+        txt(ML+3, y2-10, L['naText'], sz=8, col=DGRAY)
         hline(ML, y2-14, MR, lw=0.3)
         y2 -= 14
     else:
-        txt(ML+3, y2-10, '1. Describe type and depth of excavations:', sz=7.5)
+        txt(ML+3, y2-10, L['soil1'], sz=7.5)
         soil = val('soilType')
         scx = ML+165
-        for sv, sl in [('Type A Soil/Rock','Type A Soil/Rock'),('Type B Soil/Rock','Type B Soil/Rock'),('Type C Soil/Rock','Type C Soil/Rock')]:
+        for sv, sl in [('Type A Soil/Rock',L['typeA']),('Type B Soil/Rock',L['typeB']),('Type C Soil/Rock',L['typeC'])]:
             cb(scx, y2-13, checked=(soil==sv)); txt(scx+10, y2-10, sl, sz=7); scx+=82
         hline(ML, y2-14, MR, lw=0.3); y2 -= 14
         txt(ML+3, y2-10, val('excavDepth'), sz=8)
         hline(ML, y2-14, MR, lw=0.3); y2 -= 14
 
-        txt(ML+3, y2-10, '2. Cave-in/Engulfment control measures to be used if excavation will be greater than 5 feet:', sz=7)
+        txt(ML+3, y2-10, L['cave2'], sz=7)
         hline(ML, y2-13, MR, lw=0.3); y2 -= 13
 
         ci = d.get('civilControls', [])
@@ -393,9 +493,9 @@ def build(data_path, out_path):
 
         RH_TEXT = 26
         for lbl, key in [
-            ('3. Describe elevation/site terrain/environmental concerns/hazards:','terrain'),
-            ('4. Describe hazards with site/vehicle access (High Traffic, Heavy Haul, Boom Cranes, HAZMAT):','vehicleAccess'),
-            ('5. Describe type of electrical or gas concerns (e.g. Electrical/Gas/Fiber Optic):','elecGas'),
+                    (L['terrain3'],'terrain'),
+                    (L['vehicle4'],'vehicleAccess'),
+                    (L['elecgas5'],'elecGas'),
         ]:
             txt(ML+3, y2-9,  lbl,      sz=7)
             txt(ML+3, y2-20, val(key), sz=8)
@@ -416,22 +516,22 @@ def build(data_path, out_path):
             cb(MR-60, cb_y3, checked=(vr=='Yes')); txt(MR-51, txt_y3, 'Yes', sz=7)
             cb(MR-42, cb_y3, checked=(vr=='No'));  txt(MR-33, txt_y3, 'No',  sz=7)
 
-        yn_pair('6. Have existing utilities been potholed/located?','utilLoc',
-                '7. Has Texas 811 hot-line been contacted:','tx811', y2)
+        yn_pair(        L['util6'],'utilLoc',
+                        L['tx8117'],'tx811', y2)
         hline(ML, y2-RH_YN, MR, lw=0.3); y2 -= RH_YN
 
-        yn_pair('8. Have Utility shut valves been located?','shutValves',
-                '9. Have excavations been inspected by a trained competent person?','excavInsp', y2)
+        yn_pair(        L['valves8'],'shutValves',
+                        L['inspect9'],'excavInsp', y2)
         hline(ML, y2-RH_YN, MR, lw=0.3); y2 -= RH_YN
 
-        txt(ML+3, y2-9,  '10. Weather Conditions? (Wet, Mud, Excavation Hazards, Dry, Cracks):', sz=7)
+        txt(ML+3, y2-9, L['wx10'], sz=7)
         txt(ML+3, y2-20, val('civilWx'), sz=8)
         hline(ML, y2-26, MR, lw=0.3); y2 -= 26
 
     hline(ML, y2, MR, lw=1)
 
     # Crew Signatures
-    txt(W/2, y2-10, 'Crew Member Signature (Including Subcontractors)', sz=9, bold=True, align='center')
+    txt(W/2, y2-10, L['crew'], sz=9, bold=True, align='center')
     hline(ML, y2-13, MR)
 
     N1 = ML+PW*0.38
@@ -441,25 +541,41 @@ def build(data_path, out_path):
     rect(N1, y2-13-HDR_H, N2-N1,  HDR_H, fill=LGRAY)
     rect(N2, y2-13-HDR_H, MR-N2,  HDR_H, fill=LGRAY)
     hdr_txt_y = y2 - 13 - HDR_H/2 - 3
-    txt(ML+3, hdr_txt_y, 'Printed:',         sz=7.5, bold=True)
-    txt(N1+3, hdr_txt_y, 'Hard Hat Number:',  sz=7.5, bold=True)
-    txt(N2+3, hdr_txt_y, 'Signature:',        sz=7.5, bold=True)
+    txt(ML+3, hdr_txt_y, L['printed'], sz=7.5, bold=True)
+    txt(N1+3, hdr_txt_y, L['hh'], sz=7.5, bold=True)
+    txt(N2+3, hdr_txt_y, L['signature'], sz=7.5, bold=True)
     hline(ML, y2-13-HDR_H, MR, lw=0.5)
 
     crew = d.get('crew', [])
     cy2 = y2 - 13 - HDR_H
     CRH = 22
 
-    def crew_row(y, name='', hh='', filled=False):
+    def crew_row(y, name='', hh='', sig_b64='', filled=False):
         if y - CRH < BOT2: return False
         txt_y = y - CRH + 7
         if filled:
             txt(ML+3,  txt_y, name, sz=8, bold=True)
             txt(N1+3,  txt_y, hh,   sz=8)
+            # Draw signature image if provided
+            if sig_b64 and sig_b64.startswith('data:image'):
+                try:
+                    import base64, io
+                    from reportlab.lib.utils import ImageReader
+                    # Strip data URL prefix
+                    img_data = base64.b64decode(sig_b64.split(',')[1])
+                    img_reader = ImageReader(io.BytesIO(img_data))
+                    # Draw signature scaled to fit in signature column
+                    sig_w = MR - N2 - 6
+                    sig_h = CRH - 4
+                    c.drawImage(img_reader, N2+3, y-CRH+2,
+                                width=sig_w, height=sig_h,
+                                preserveAspectRatio=True, mask='auto')
+                except Exception as e:
+                    print(f"Sig draw error: {e}", flush=True)
         else:
-            txt(ML+3,  txt_y, 'Printed:',         sz=7, col=DGRAY)
-            txt(N1+3,  txt_y, 'Hard Hat Number:',  sz=7, col=DGRAY)
-            txt(N2+3,  txt_y, 'Signature:',        sz=7, col=DGRAY)
+            txt(ML+3,  txt_y, L['printed'], sz=7, col=DGRAY)
+            txt(N1+3,  txt_y, L['hh'], sz=7, col=DGRAY)
+            txt(N2+3,  txt_y, L['signature'], sz=7, col=DGRAY)
         vline(N1, y-CRH, y, lw=0.3)
         vline(N2, y-CRH, y, lw=0.3)
         hline(ML, y-CRH, MR, lw=0.3)
@@ -473,7 +589,11 @@ def build(data_path, out_path):
         if cy2 - CRH < BOT2:
             p3_crew = crew[i:]
             break
-        crew_row(cy2, crew[i].get('name',''), crew[i].get('hh',''), filled=True)
+        crew_row(cy2,
+                 crew[i].get('name',''),
+                 crew[i].get('hh',''),
+                 crew[i].get('sig',''),
+                 filled=True)
         p2_crew.append(crew[i])
         cy2 -= CRH
 
@@ -489,7 +609,7 @@ def build(data_path, out_path):
     # ══════════════════════════════════════════════════════════════════
     TOP3 = 756
     rect(ML, BOT2, PW, TOP3-BOT2, lw=1)
-    txt(W/2, TOP3-11, '(JHA) Job Hazard Analysis', sz=10, bold=True, align='center')
+    txt(W/2, TOP3-11, f"({('AHP' if lang=='es' else 'JHA')}) {L['title1']} {L['title2']}", sz=10, bold=True, align='center')
     hline(ML, TOP3-14, MR, lw=1)
 
     cy3 = TOP3-14
@@ -497,9 +617,9 @@ def build(data_path, out_path):
     rect(N1, cy3-HDR_H, N2-N1,  HDR_H, fill=LGRAY)
     rect(N2, cy3-HDR_H, MR-N2,  HDR_H, fill=LGRAY)
     hdr3_y = cy3 - HDR_H/2 - 3
-    txt(ML+3, hdr3_y, 'Printed:',         sz=7.5, bold=True)
-    txt(N1+3, hdr3_y, 'Hard Hat Number:',  sz=7.5, bold=True)
-    txt(N2+3, hdr3_y, 'Signature:',        sz=7.5, bold=True)
+    txt(ML+3, hdr3_y, L['printed'], sz=7.5, bold=True)
+    txt(N1+3, hdr3_y, L['hh'], sz=7.5, bold=True)
+    txt(N2+3, hdr3_y, L['signature'], sz=7.5, bold=True)
     hline(ML, cy3-HDR_H, MR, lw=0.3)
     cy3 -= HDR_H
 
@@ -507,8 +627,11 @@ def build(data_path, out_path):
     for i in range(total_p3):
         if cy3 - CRH < BOT2: break
         filled = i < len(p3_crew)
-        crew_row(cy3, p3_crew[i].get('name','') if filled else '',
-                       p3_crew[i].get('hh','')   if filled else '', filled=filled)
+        crew_row(cy3,
+                 p3_crew[i].get('name','') if filled else '',
+                 p3_crew[i].get('hh','')   if filled else '',
+                 p3_crew[i].get('sig','')  if filled else '',
+                 filled=filled)
         cy3 -= CRH
 
     c.showPage()
