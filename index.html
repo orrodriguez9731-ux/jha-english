@@ -286,10 +286,10 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
   <div style="background:var(--mid);border:1.5px solid var(--border);border-radius:12px;padding:20px 16px;margin-bottom:10px">
     <div style="font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">Select Language / Seleccione Idioma</div>
     <button onclick="setLang('en')" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:18px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:2px;cursor:pointer;margin-bottom:12px;display:block">
-      ENGLISH
+      🇺🇸 ENGLISH
     </button>
     <button onclick="setLang('es')" style="width:100%;background:var(--mid);color:var(--light);border:2px solid var(--orange);border-radius:10px;padding:18px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:2px;cursor:pointer;display:block">
-      ESPAÑOL
+      🇲🇽 ESPAÑOL
     </button>
   </div>
   <p style="font-size:.75rem;color:var(--muted);margin-top:12px">Job Hazard Analysis (JHA)</p>
@@ -388,7 +388,7 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
 <div class="sec" id="s5">
   <div class="sec-title"><div class="sec-icon">🔢</div>Steps Involved</div>
   <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px">List the steps involved in preparing for your work (up to 5).</p>
-  <div style="background:rgba(255,184,0,0.07);border:1px solid rgba(255,184,0,0.25);border-radius:8px;padding:11px 13px;margin-bottom:16px">
+  <div id="stepsExBox" style="background:rgba(255,184,0,0.07);border:1px solid rgba(255,184,0,0.25);border-radius:8px;padding:11px 13px;margin-bottom:16px">
     <p style="font-size:.72rem;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Examples</p>
     <p style="font-size:.75rem;color:var(--muted);line-height:1.6;margin-bottom:6px"><span style="color:var(--light);font-weight:600">Painter</span> — Scope: paint walls &nbsp;/&nbsp; Steps: locate wash and water area, tape up surrounding areas, clean surfaces after work is done</p>
     <p style="font-size:.75rem;color:var(--muted);line-height:1.6;margin-bottom:6px"><span style="color:var(--light);font-weight:600">Drywall</span> — Scope: frame walls &nbsp;/&nbsp; Steps: gather material, lay out and frame walls, general clean up</p>
@@ -812,8 +812,45 @@ function ck(el) {
 }
 
 function getChecked(prefix) {
+  // Return the data-k values (shortcodes) — language independent
   return [...document.querySelectorAll(`.ckitem[data-k^="${prefix}"].on`)]
-    .map(el => el.querySelector('.cklabel').textContent.trim());
+    .map(el => el.dataset.k);
+}
+
+// Map hazard shortcodes back to English keys for PDF builder
+function getHazardsEnglish() {
+  const EN = HAZ_LABELS['en'];
+  return getChecked('h_').map(k => EN[k] || k).filter(Boolean);
+}
+
+// Map civil control shortcodes to English values the PDF builder expects
+const CI_MAP = {
+  'ci_sloping':'Sloping','ci_benching':'Benching','ci_trenching':'Trenching',
+  'ci_shoring':'Shoring','ci_shield':'Shield / Box',
+  'ci_ladder':"Ladder in Trench >5 ft and Every 25'",'ci_sump':'Sump Pump','ci_loto':'LOTO'
+};
+function getCivilControls() {
+  return getChecked('ci_').map(k => CI_MAP[k] || k).filter(Boolean);
+}
+
+// Map ergo shortcodes to English
+const ERGO_MAP = {
+  'e_awkward':'Awkward Positioning','e_reach':'Reach/Clear Access',
+  'e_force':'Excessive Force','e_repetitive':'Repetitive Movements',
+  'e_lifting':'Lifting','e_sharpsurf':'Sharp Work Surfaces',
+  'e_overhead':'Overhead Work','e_vibrating':'Vibrating Tools/Equipment'
+};
+function getErgos() {
+  return getChecked('e_').map(k => ERGO_MAP[k] || k).filter(Boolean);
+}
+
+// Map PPE shortcodes to English
+const PPE_MAP = {
+  'ppe_hat':'Hard Hat','ppe_glasses':'Safety Glasses',
+  'ppe_vest':'Safety Vest','ppe_boots':'Work Boots'
+};
+function getPPE() {
+  return getChecked('ppe_').map(k => PPE_MAP[k] || k).filter(Boolean);
 }
 
 // ──────────────────────────────────────────
@@ -898,12 +935,12 @@ function collectData() {
     clinicName: v('clinicName'), clinicLoc: v('clinicLoc'),
     clinicProto: getRadio('clinicProto'), hospName: v('hospName'), hospLoc: v('hospLoc'),
     steps: [v('step1'),v('step2'),v('step3'),v('step4'),v('step5')].filter(s => s !== '—'),
-    hazards: getChecked('h_'), otherHaz: v('otherHaz'),
+    hazards: getHazardsEnglish(), otherHaz: v('otherHaz'),
     preventive: [v('pm1'),v('pm2'),v('pm3'),v('pm4'),v('pm5'),v('pm6'),v('pm7'),v('pm8')].filter(s => s !== '—'),
-    ergos: getChecked('e_'),
-    ppe: getChecked('ppe_'), otherPPE: v('otherPPE'),
+    ergos: getErgos(),
+    ppe: getPPE(), otherPPE: v('otherPPE'),
     soilType: civilIsNA() ? '' : getRadio('soilType'), excavDepth: civilIsNA() ? '' : v('excavDepth'),
-    civilControls: civilIsNA() ? [] : getChecked('ci_'),
+    civilControls: civilIsNA() ? [] : getCivilControls(),
     terrain: civilIsNA() ? '' : v('terrain'), vehicleAccess: civilIsNA() ? '' : v('vehicleAccess'), elecGas: civilIsNA() ? '' : v('elecGas'),
     utilLoc: civilIsNA() ? '' : getRadio('utilLoc'), tx811: civilIsNA() ? '' : getRadio('tx811'),
     shutValves: civilIsNA() ? '' : getRadio('shutValves'), excavInsp: civilIsNA() ? '' : getRadio('excavInsp'), civilWx: civilIsNA() ? '' : v('civilWx'),
@@ -1277,7 +1314,7 @@ const T = {
     stretcherLbl: 'Ubicación de Camilla / Canasta / Rescate en Altura – N/A',
     msdsLbl: 'Ubicación de M.S.D.S / S.D.S – Oficina DWCC',
     evacuationLbl: 'Puntos de Evacuación – Estacionamiento',
-    fireExtLbl: 'Extinguidores – Espacios Renovados / Baños',
+    fireExtLbl: 'Extintores – Espacios Renovados / Baños',
     clinicNameLbl: 'Nombre de la Clínica', clinicLocLbl: 'Ubicación de la Clínica',
     clinicProtoQ: 'Sé dónde está ubicada la clínica',
     hospNameLbl: 'Hospital Más Cercano', hospLocLbl: 'Ubicación del Hospital',
@@ -1328,61 +1365,59 @@ const T = {
 // Hazard labels bilingual
 const HAZ_LABELS = {
   en: {
-    'Access / Egress': 'Access / Egress', 'Crane': 'Crane', 'Fire Hazards': 'Fire Hazards',
-    'Impalement Hazards': 'Impalement Hazards', 'Material Handling': 'Material Handling',
-    'Access to General Public': 'Access to General Public', 'Demolition': 'Demolition',
-    'Floor / Wall Openings': 'Floor / Wall Openings', 'Ladders (Tied Off / Inspected)': 'Ladders (Tied Off / Inspected)',
-    'Overhead Power Lines': 'Overhead Power Lines', 'Barricades / Signage': 'Barricades / Signage',
-    'Electrical Hazards': 'Electrical Hazards', 'Guardrails / Toeboards / Bracing': 'Guardrails / Toeboards / Bracing',
-    'Lifts': 'Lifts', 'Pinch Points': 'Pinch Points', 'Chemical Hazards': 'Chemical Hazards',
-    'Excavation / Trench': 'Excavation / Trench', 'Hearing Protection': 'Hearing Protection',
-    'Lighting': 'Lighting', 'Powder Actuated Tools': 'Powder Actuated Tools',
-    'Confined Spaces': 'Confined Spaces', 'Fall Hazards': 'Fall Hazards', 'Heavy Equipment': 'Heavy Equipment',
-    'Lockout / Tagout': 'Lockout / Tagout', 'Traffic Control': 'Traffic Control',
-    'Inspection Current': 'Inspection Current', 'Proper Tools for the Job': 'Proper Tools for the Job',
-    'Tools in Good Working Condition': 'Tools in Good Working Condition',
-    'Qualification Required': 'Qualification Required', 'Manual Lifting Equipment': 'Manual Lifting Equipment',
-    'Proper Rigging Practices': 'Proper Rigging Practices',
-    'Manual Lifting (Using Your Legs) <50 lbs': 'Manual Lifting (Using Your Legs) <50 lbs',
-    'Hole Covers': 'Hole Covers', 'Overhead Work / Other': 'Overhead Work / Other',
-    'Work Crews Heavy Equipment': 'Work Crews Heavy Equipment', 'Underground Utilities': 'Underground Utilities',
-    'Scaffold (Properly Inspected by Competent Person)': 'Scaffold (Properly Inspected by Competent Person)',
-    'Personal Basket (Inspected and Approved)': 'Personal Basket (Inspected and Approved)',
-    'Aerial Lift / Certification': 'Aerial Lift / Certification', 'Confined Space (Entry)': 'Confined Space (Entry)',
-    'Try Start / Stop Switch': 'Try Start / Stop Switch', 'GFCI': 'GFCI',
-    'Slip / Trip Potential': 'Slip / Trip Potential', 'Body Position / Line of Fire': 'Body Position / Line of Fire',
-    'Crush By / Struck By / Contact With': 'Crush By / Struck By / Contact With',
-    'Adequate Anchorage Points': 'Adequate Anchorage Points', 'Sharp Objects': 'Sharp Objects',
-    'Lift Equipment Properly Inspected by Qualified Person': 'Lift Equipment Properly Inspected by Qualified Person',
+    'h_access':'Access / Egress','h_crane':'Crane','h_fire':'Fire Hazards',
+    'h_impale':'Impalement Hazards','h_mathand':'Material Handling',
+    'h_public':'Access to General Public','h_demo':'Demolition',
+    'h_flooropen':'Floor / Wall Openings','h_ladders':'Ladders (Tied Off / Inspected)',
+    'h_ovhdpwr':'Overhead Power Lines','h_barric':'Barricades / Signage',
+    'h_elec':'Electrical Hazards','h_guard':'Guardrails / Toeboards / Bracing',
+    'h_lifts':'Lifts','h_pinch':'Pinch Points','h_chem':'Chemical Hazards',
+    'h_excav':'Excavation / Trench','h_hearing':'Hearing Protection',
+    'h_lighting':'Lighting','h_powder':'Powder Actuated Tools',
+    'h_confined':'Confined Spaces','h_fall':'Fall Hazards','h_heavyeq':'Heavy Equipment',
+    'h_lockout':'Lockout / Tagout','h_traffic':'Traffic Control',
+    'h_inspect':'Inspection Current','h_protools':'Proper Tools for the Job',
+    'h_toolcond':'Tools in Good Working Condition','h_qualreq':'Qualification Required',
+    'h_liftinsp':'Lift Equipment Properly Inspected by Qualified Person',
+    'h_manlift':'Manual Lifting Equipment','h_rigging':'Proper Rigging Practices',
+    'h_legs50':'Manual Lifting (Using Your Legs) <50 lbs','h_holes':'Hole Covers',
+    'h_ovhdwk':'Overhead Work / Other','h_wkcrews':'Work Crews Heavy Equipment',
+    'h_underground':'Underground Utilities',
+    'h_scaffold':'Scaffold (Properly Inspected by Competent Person)',
+    'h_basket':'Personal Basket (Inspected and Approved)',
+    'h_aeriallift':'Aerial Lift / Certification','h_confined2':'Confined Space (Entry)',
+    'h_trystart':'Try Start / Stop Switch','h_gfci':'GFCI',
+    'h_slip':'Slip / Trip Potential','h_bodypos':'Body Position / Line of Fire',
+    'h_crush':'Crush By / Struck By / Contact With',
+    'h_anchor':'Adequate Anchorage Points','h_sharp':'Sharp Objects',
   },
   es: {
-    // Exact wording from official D. Wilson Spanish JHA PDF
-    'Access / Egress': 'Acceso/ Salida', 'Crane': 'Grua', 'Fire Hazards': 'Riesgos de Incendio',
-    'Impalement Hazards': 'Peligros de Empalamiento', 'Material Handling': 'Manejo de Materiales',
-    'Access to General Public': 'Acceso al Publico en General', 'Demolition': 'Demolición',
-    'Floor / Wall Openings': 'Pisos/ Aberturas de Pared', 'Ladders (Tied Off / Inspected)': 'Escaleras/ Atado/ Inspeccionado',
-    'Overhead Power Lines': 'Líneas de Alta Tensión', 'Barricades / Signage': 'Barricadas/ Señalización',
-    'Electrical Hazards': 'Peligros Electricos', 'Guardrails / Toeboards / Bracing': 'Barandillas Rodapiés/ Vigorizante',
-    'Lifts': 'Ascensores', 'Pinch Points': 'Puntos de Pellizco', 'Chemical Hazards': 'Peligros Químicos',
-    'Excavation / Trench': 'Excavación/ Zanja', 'Hearing Protection': 'Protección Auditiva',
-    'Lighting': 'Iluminación', 'Powder Actuated Tools': 'Herramientas Accionadas por Pólvora',
-    'Confined Spaces': 'Espacio Confinado', 'Fall Hazards': 'Peligro de Caída', 'Heavy Equipment': 'Equipamiento Pesado',
-    'Lockout / Tagout': 'Bloqueo/ Etiquete', 'Traffic Control': 'Control de Trafico',
-    'Inspection Current': 'Inspección de Corriente', 'Proper Tools for the Job': 'Herramientas Adecuadas para el Trabajo',
-    'Tools in Good Working Condition': 'Herramientas en Buenas Condiciones de Trabajo',
-    'Qualification Required': 'Calificación Requerida', 'Manual Lifting Equipment': 'Levantamiento Equipo Manual',
-    'Proper Rigging Practices': 'Prácticas Adecuadas de Aparejo',
-    'Manual Lifting (Using Your Legs) <50 lbs': 'Levantamiento Equipo Manual (Usando Tus Piernas) <50 lbs',
-    'Hole Covers': 'Tapas de Agujeros', 'Overhead Work / Other': 'Trabajo por Encima de la Cabeza- Otro',
-    'Work Crews Heavy Equipment': 'Equipo de Trabajo Pesado', 'Underground Utilities': 'Servicios Públicos Subterráneos',
-    'Scaffold (Properly Inspected by Competent Person)': 'Andamio-Inspeccionada por una Persona Competente',
-    'Personal Basket (Inspected and Approved)': 'Canasta Personal (Inspeccionado y Aprobado)',
-    'Aerial Lift / Certification': 'Ascensor Aéreo/ Certificación', 'Confined Space (Entry)': 'Espacio Confinado',
-    'Try Start / Stop Switch': 'Intentar Empezar/ Interruptor de Parada', 'GFCI': 'GFCI',
-    'Slip / Trip Potential': 'Deslizar/ Potencial de Viaje', 'Body Position / Line of Fire': 'Posición del Cuerpo/ Linea de Fuego',
-    'Crush By / Struck By / Contact With': 'Aplastar Por/ Golpeado Por/ Contactar Con',
-    'Adequate Anchorage Points': 'Puntos de Anclaje Adecuados', 'Sharp Objects': 'Objetos Afilados',
-    'Lift Equipment Properly Inspected by Qualified Person': 'Equipo de Elevación Debidamente Inspeccionado por una Persona Calificada',
+    'h_access':'Acceso/ Salida','h_crane':'Grua','h_fire':'Riesgos de Incendio',
+    'h_impale':'Peligros de Empalamiento','h_mathand':'Manejo de Materiales',
+    'h_public':'Acceso al Publico en General','h_demo':'Demolición',
+    'h_flooropen':'Pisos/ Aberturas de Pared','h_ladders':'Escaleras/ Atado/ Inspeccionado',
+    'h_ovhdpwr':'Líneas de Alta Tensión','h_barric':'Barricadas/ Señalización',
+    'h_elec':'Peligros Electricos','h_guard':'Barandillas Rodariés/ Vigorizante',
+    'h_lifts':'Ascensores','h_pinch':'Puntos de Pellizco','h_chem':'Peligros Químicos',
+    'h_excav':'Excavación/ Zanja','h_hearing':'Protección Auditiva',
+    'h_lighting':'Iluminación','h_powder':'Herramientas Accionadas por Pólvora',
+    'h_confined':'Espacio Confinado','h_fall':'Peligro de Caída','h_heavyeq':'Equipamiento Pesado',
+    'h_lockout':'Bloqueo/ Etiquete','h_traffic':'Control de Trafico',
+    'h_inspect':'Corriente de Inspección','h_protools':'Herramientas Adecuadas para el Trabajo',
+    'h_toolcond':'Herramientas en Buenas Condiciones de Trabajo',
+    'h_qualreq':'Calificación Requerida',
+    'h_liftinsp':'Equipo de Elevación Debidamente Inspeccionado por una Persona Calificada',
+    'h_manlift':'Levantamiento Equipo Manual','h_rigging':'Prácticas Adecuadas de Aparejo',
+    'h_legs50':'Levantamiento Manual (Usando Tus Piernas) <50 lbs',
+    'h_holes':'Tapas de Agujeros','h_ovhdwk':'Trabajo por Encima de la Cabeza- Otro',
+    'h_wkcrews':'Equipo de Trabajo Pesado','h_underground':'Servicios Públicos Subterráneos',
+    'h_scaffold':'Andamio-Inspeccionada por una Persona Competente',
+    'h_basket':'Canasta Personal (Inspeccionado y Aprobado)',
+    'h_aeriallift':'Ascensor Aéreo/ Certificación','h_confined2':'Espacio Confinado',
+    'h_trystart':'Intentar Empezar/ Interruptor de Parada','h_gfci':'GFCI',
+    'h_slip':'Deslizar/ Potencial de Viaje','h_bodypos':'Posición del Cuerpo/ Linea de Fuego',
+    'h_crush':'Aplastar Por/ Golpeado Por/ Contactar Con',
+    'h_anchor':'Puntos de Anclaje Adecuados','h_sharp':'Objetos Afilados',
   }
 };
 
@@ -1475,10 +1510,9 @@ function applyLang(lang) {
   if (s4slbls[3]) s4slbls[3].textContent = t.clinicProtoQ;
 
   // Section 5
-  const s5p = document.querySelector('#s5 p');
+  const s5p = document.querySelector('#s5 > p');
   if (s5p) s5p.textContent = t.stepsSubtitle;
-  const s5exTitle = document.querySelector('#s5 .info p:first-child');
-  const s5box = document.querySelector('#s5 div[style*="amber"]') || document.querySelector('#s5 div[style*="FFB800"]');
+  const s5box = document.getElementById('stepsExBox');
   if (s5box) {
     const ps = s5box.querySelectorAll('p');
     if (ps[0]) ps[0].textContent = t.stepsEx;
