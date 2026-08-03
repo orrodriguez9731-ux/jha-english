@@ -30,7 +30,7 @@ body {
   background: var(--dark);
   color: var(--light);
   min-height: 100vh;
-  padding-bottom: 90px;
+  padding-bottom: 120px;
   overscroll-behavior: none;
 }
 
@@ -60,7 +60,7 @@ body {
 .prog-fill { height: 100%; background: #fff; border-radius: 4px; transition: width .4s ease; }
 
 /* ── SECTIONS ── */
-.sec { display: none; padding: 20px 16px; animation: sIn .3s ease; }
+.sec { display: none; padding: 20px 16px 130px; animation: sIn .3s ease; }
 .sec.on { display: block; }
 @keyframes sIn { from { opacity:0; transform:translateX(18px); } to { opacity:1; transform:translateX(0); } }
 
@@ -286,10 +286,10 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
   <div style="background:var(--mid);border:1.5px solid var(--border);border-radius:12px;padding:20px 16px;margin-bottom:10px">
     <div style="font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px">Select Language / Seleccione Idioma</div>
     <button onclick="setLang('en')" style="width:100%;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:18px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:2px;cursor:pointer;margin-bottom:12px;display:block">
-      ENGLISH
+      🇺🇸 ENGLISH
     </button>
     <button onclick="setLang('es')" style="width:100%;background:var(--mid);color:var(--light);border:2px solid var(--orange);border-radius:10px;padding:18px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1.4rem;letter-spacing:2px;cursor:pointer;display:block">
-      
+      🇲🇽 ESPAÑOL
     </button>
   </div>
   <p style="font-size:.75rem;color:var(--muted);margin-top:12px">Job Hazard Analysis (JHA)</p>
@@ -724,15 +724,18 @@ function render() {
 // Hazard reference panel for Preventive Measures
 // ──────────────────────────────────────────
 function buildHazardRef() {
-  const hazards = getChecked('h_');
+  const keys = getChecked('h_');
   const otherHaz = document.getElementById('otherHaz')?.value.trim();
-  if (otherHaz) hazards.push(otherHaz);
+
+  // Map shortcodes to display labels in current language
+  const displayLabels = keys.map(k => HAZ_LABELS[LANG]?.[k] || HAZ_LABELS['en']?.[k] || k);
+  if (otherHaz) displayLabels.push(otherHaz);
 
   const list = document.getElementById('hazardRefList');
   const empty = document.getElementById('hazardRefEmpty');
   list.innerHTML = '';
 
-  if (hazards.length === 0) {
+  if (displayLabels.length === 0) {
     list.style.display = 'none';
     empty.style.display = 'block';
     return;
@@ -740,7 +743,7 @@ function buildHazardRef() {
 
   list.style.display = 'flex';
   empty.style.display = 'none';
-  hazards.forEach(h => {
+  displayLabels.forEach(h => {
     const tag = document.createElement('span');
     tag.textContent = h;
     tag.style.cssText = `
@@ -1423,20 +1426,44 @@ const HAZ_LABELS = {
 
 // Ergo labels bilingual
 const ERGO_LABELS = {
-  en: { 'Awkward Positioning':'Awkward Positioning','Reach/Clear Access':'Reach/Clear Access','Excessive Force':'Excessive Force','Repetitive Movements':'Repetitive Movements','Lifting':'Lifting','Sharp Work Surfaces':'Sharp Work Surfaces','Overhead Work':'Overhead Work','Vibrating Tools/Equipment':'Vibrating Tools/Equipment' },
-  es: { 'Awkward Positioning':'Posicionamiento Incómodo','Reach/Clear Access':'Alcance / Acceso Libre','Excessive Force':'Fuerza Excesiva','Repetitive Movements':'Movimientos Repetitivos','Lifting':'Levantamiento','Sharp Work Surfaces':'Superficies Cortantes','Overhead Work':'Trabajo en Altura','Vibrating Tools/Equipment':'Herramientas / Equipos Vibratorios' }
+  en: {
+    'e_awkward':'Awkward Positioning','e_reach':'Reach/Clear Access',
+    'e_force':'Excessive Force','e_repetitive':'Repetitive Movements',
+    'e_lifting':'Lifting','e_sharpsurf':'Sharp Work Surfaces',
+    'e_overhead':'Overhead Work','e_vibrating':'Vibrating Tools/Equipment'
+  },
+  es: {
+    'e_awkward':'Posicionamiento Incómodo','e_reach':'Llegar/ Claro Acceso',
+    'e_force':'Fuerza Excesiva','e_repetitive':'Movimientos Repetitivos',
+    'e_lifting':'Levantamiento','e_sharpsurf':'Superficies de Trabajo Afiladas',
+    'e_overhead':'Trabajo por Encima de la Cabeza','e_vibrating':'Herramientas Vibrantes/ Equipo'
+  }
 };
 
 // PPE labels bilingual
 const PPE_LABELS = {
-  en: { 'Hard Hat':'Hard Hat','Safety Glasses':'Safety Glasses','Safety Vest':'Safety Vest','Work Boots':'Work Boots' },
-  es: { 'Hard Hat':'Casco de Seguridad','Safety Glasses':'Lentes de Seguridad','Safety Vest':'Chaleco de Seguridad','Work Boots':'Botas de Trabajo' }
+  en: {
+    'ppe_hat':'Hard Hat','ppe_glasses':'Safety Glasses',
+    'ppe_vest':'Safety Vest','ppe_boots':'Work Boots'
+  },
+  es: {
+    'ppe_hat':'Casco de Seguridad','ppe_glasses':'Lentes de Seguridad',
+    'ppe_vest':'Chaleco de Seguridad','ppe_boots':'Botas de Trabajo'
+  }
 };
 
 // Cave-in controls bilingual
 const CAVE_LABELS = {
-  en: { 'Sloping':'Sloping','Benching':'Benching','Trenching':'Trenching','Shoring':'Shoring',"Shield / Box":'Shield / Box',"Ladder in Trench >5 ft and Every 25'":'Ladder in Trench >5 ft and Every 25\'','Sump Pump':'Sump Pump','LOTO':'LOTO' },
-  es: { 'Sloping':'Talud','Benching':'Escalonado','Trenching':'Zanjado','Shoring':'Apuntalamiento',"Shield / Box":'Escudo / Caja',"Ladder in Trench >5 ft and Every 25'":'Escalera en Zanja >5 pies y Cada 25\'','Sump Pump':'Bomba de Achique','LOTO':'LOTO' }
+  en: {
+    'ci_sloping':'Sloping','ci_benching':'Benching','ci_trenching':'Trenching',
+    'ci_shoring':'Shoring','ci_shield':'Shield / Box',
+    'ci_ladder':"Ladder in Trench >5 ft and Every 25'",'ci_sump':'Sump Pump','ci_loto':'LOTO'
+  },
+  es: {
+    'ci_sloping':'Inclinado','ci_benching':'Banco','ci_trenching':'Excavación de Zanjas',
+    'ci_shoring':'Puntales','ci_shield':'Caja de Escudo',
+    'ci_ladder':'Escalera en la Zanja >5 pies y Cada 25\'','ci_sump':'Bomba de Sumidero','ci_loto':'LOTO'
+  }
 };
 
 // ──────────────────────────────────────────
