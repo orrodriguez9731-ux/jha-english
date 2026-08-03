@@ -384,7 +384,7 @@ def build(data_path, out_path):
     iqw=stringWidth(L['injuredQ'],'Helvetica',8)
     cb(ML+3+iqw+5,y-39,checked=(inj=='Yes')); txt(ML+3+iqw+15,y-36,L['yes'],sz=8)
     cb(ML+3+iqw+30,y-39,checked=(inj=='No')); txt(ML+3+iqw+40,y-36,L['no'],sz=8)
-    hline(ML,y-42,MR); y-=42
+  
 
     emerg=d.get('emergChecks',[])
     EMERG_MAP=[('firstAid',L['firstAid']),('stretcher',L['stretcher']),('msds',L['msds']),
