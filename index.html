@@ -366,8 +366,8 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
     <div class="ckitem" data-k="firstAid" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">First Aid Kit Location <span style="color:var(--accent);font-weight:600">– DWCC office</span></span></div>
     <div class="ckitem" data-k="stretcher" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Stretcher / Basket / High-Rise Rescue Location <span style="color:var(--accent);font-weight:600">– N/A</span></span></div>
     <div class="ckitem" data-k="msds" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">M.S.D.S / S.D.S Location <span style="color:var(--accent);font-weight:600">– DWCC office</span></span></div>
-    <div class="ckitem" data-k="evacuation" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Evacuation Points <span style="color:var(--accent);font-weight:600">– Parking Lot</span></span></div>
-    <div class="ckitem" data-k="fireExt" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Fire Extinguisher Location(s) <span style="color:var(--accent);font-weight:600">– Renovated Spaces / RR</span></span></div>
+    <div class="ckitem" data-k="evacuation" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Evacuation Points <span style="color:var(--accent);font-weight:600">– Parking Lot in front of the trailer </span></span></div>
+    <div class="ckitem" data-k="fireExt" onclick="ck(this)"><input type="checkbox"><div class="ckbox"></div><span class="cklabel">Fire Extinguisher Location(s) <span style="color:var(--accent);font-weight:600">– Restrooms, Trailer, Building Pad</span></span></div>
   </div>
 
   <hr class="div">
@@ -379,7 +379,7 @@ hr.div { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
     <div class="rbtn" data-g="clinicProto" data-v="No">No</div>
   </div>
   <div class="fld"><label class="lbl">Nearest Hospital Name</label><input type="text" id="hospName" placeholder="Hospital name" value="Knapp Medical Center"></div>
-  <div class="fld"><label class="lbl">Nearest Hospital Location</label><input type="text" id="hospLoc" placeholder="Hospital address" value="1401 E 8th St, Weslaco, TX 78596"></div>
+  <div class="fld"><label class="lbl">Nearest Hospital Location</label><input type="text" id="hospLoc" placeholder="Hospital address" value="1401 E 8th St, Weslaco"></div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -1317,7 +1317,7 @@ const T = {
     stretcherLbl: 'Ubicación de Camilla / Canasta / Rescate en Altura – N/A',
     msdsLbl: 'Ubicación de M.S.D.S / S.D.S – Oficina DWCC',
     evacuationLbl: 'Puntos de Evacuación – Estacionamiento',
-    fireExtLbl: 'Extintores – Espacios Renovados / Baños',
+    fireExtLbl: 'Extinguidores – Espacios Renovados / Baños',
     clinicNameLbl: 'Nombre de la Clínica', clinicLocLbl: 'Ubicación de la Clínica',
     clinicProtoQ: 'Sé dónde está ubicada la clínica',
     hospNameLbl: 'Hospital Más Cercano', hospLocLbl: 'Ubicación del Hospital',
@@ -1342,7 +1342,7 @@ const T = {
     terrainLbl: '3. Elevación / Terreno / Preocupaciones Ambientales / Peligros', terrainPH: 'Describa elevación, terreno, peligros ambientales…',
     vehicleLbl: '4. Peligros con Acceso al Sitio / Vehículos', vehiclePH: 'Tráfico pesado, carga pesada, grúas, almacenamiento de materiales/HAZMAT…',
     elecGasLbl: '5. Preocupaciones de Electricidad o Gas', elecGasPH: 'ej. Línea Eléctrica/Gas/Fibra Óptica…',
-    utilLocQ: '6. ¿Han sido ubicadas/sondeadas las tuberías existentes?',
+    utilLocQ: '6. ¿Han sido ubicadas las tuberías existentes?',
     tx811Q: '7. ¿Se contactó a Texas 811?',
     shutValvesQ: '8. ¿Han sido localizadas las válvulas de cierre de servicios?',
     excavInspQ: '9. ¿Ha sido inspeccionada la excavación por una persona competente?',
